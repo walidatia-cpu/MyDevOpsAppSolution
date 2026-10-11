@@ -34,3 +34,19 @@ steps:
     command: 'test'
     projects: '**/*Tests/*.csproj' # استهداف مشروع الاختبارات فقط
     arguments: '--configuration $(buildConfiguration) --no-build'
+# 4. عمل Publish للمشروع
+- task: DotNetCoreCLI@2
+  displayName: 'Publish the project'
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
+
+# 5. رفع الملفات كـ Artifact لتكون جاهزة لمرحلة الـ Deployment
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
