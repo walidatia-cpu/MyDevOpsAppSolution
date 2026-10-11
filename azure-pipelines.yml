@@ -1,52 +1,117 @@
-# تحديد متى يعمل هذا البايبلاين
 trigger:
-  - master # يعمل عند الدمج النهائي في الفرع الرئيسي
-
-pr:
-  - master # يعمل تلقائياً عند فتح Pull Request باتجاه الفرع الرئيسي
+- master
 
 pool:
-  vmImage: 'ubuntu-latest' # استخدام بيئة لينكس لأنها أسرع وأخف لمشاريع .NET Core
+  vmImage: 'ubuntu-latest'
 
 variables:
   buildConfiguration: 'Release'
+  azureServiceConnection: 'Azure-Connection' 
+  testWebAppName: 'mydevopsapp-test-123'
+  prodWebAppName: 'mydevopsapp-prod-123'
 
-steps:
-# 1. تحميل الحزم (Restore)
-- task: DotNetCoreCLI@2
-  displayName: 'Restore dependencies'
-  inputs:
-    command: 'restore'
-    projects: '**/*.csproj'
+stages:
+# ==========================================
+# المرحلة الأولى: البناء والاختبار (CI)
+# ==========================================
+- stage: Build
+  displayName: 'Build, Test, and Publish'
+  jobs:
+  - job: BuildJob
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore dependencies'
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'
 
-# 2. بناء المشروع (Build)
-- task: DotNetCoreCLI@2
-  displayName: 'Build the project'
-  inputs:
-    command: 'build'
-    projects: '**/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-restore'
+    - task: DotNetCoreCLI@2
+      displayName: 'Build the project'
+      inputs:
+        command: 'build'
+        projects: '**/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-restore'
 
-# 3. تشغيل الاختبارات (Test)
-- task: DotNetCoreCLI@2
-  displayName: 'Run Unit Tests'
-  inputs:
-    command: 'test'
-    projects: '**/*Tests/*.csproj' # استهداف مشروع الاختبارات فقط
-    arguments: '--configuration $(buildConfiguration) --no-build'
-# 4. عمل Publish للمشروع
-- task: DotNetCoreCLI@2
-  displayName: 'Publish the project'
-  inputs:
-    command: 'publish'
-    publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: true
+    - task: DotNetCoreCLI@2
+      displayName: 'Run Unit Tests'
+      inputs:
+        command: 'test'
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-build'
 
-# 5. رفع الملفات كـ Artifact لتكون جاهزة لمرحلة الـ Deployment
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish the project'
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: true
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+# ==========================================
+# المرحلة الثانية: النشر لبيئة الاختبار (CD - Test)
+# ==========================================
+- stage: DeployToTest
+  displayName: 'Deploy to Test Environment'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - deployment: DeployTest
+    environment: 'Test'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Artifact'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy to Test App'
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: '$(azureServiceConnection)'
+              appType: 'webApp'
+              WebAppName: '$(testWebAppName)'
+              packageForLinux: '$(System.ArtifactsDirectory)/drop/**/*.zip'
+
+# ==========================================
+# المرحلة الثالثة: النشر لبيئة الإنتاج (CD - Production)
+# ==========================================
+- stage: DeployToProduction
+  displayName: 'Deploy to Production Environment'
+  dependsOn: DeployToTest
+  condition: succeeded()
+  jobs:
+  - deployment: DeployProd
+    environment: 'Production' # الكلمة دي هي السر اللي هنعمل بيها الموافقة اليدوية
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Artifact'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy to Prod App'
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: '$(azureServiceConnection)'
+              appType: 'webApp'
+              WebAppName: '$(prodWebAppName)'
+              packageForLinux: '$(System.ArtifactsDirectory)/drop/**/*.zip'
