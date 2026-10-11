@@ -1,0 +1,36 @@
+# تحديد متى يعمل هذا البايبلاين
+trigger:
+  - master # يعمل عند الدمج النهائي في الفرع الرئيسي
+
+pr:
+  - master # يعمل تلقائياً عند فتح Pull Request باتجاه الفرع الرئيسي
+
+pool:
+  vmImage: 'ubuntu-latest' # استخدام بيئة لينكس لأنها أسرع وأخف لمشاريع .NET Core
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+# 1. تحميل الحزم (Restore)
+- task: DotNetCoreCLI@2
+  displayName: 'Restore dependencies'
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+
+# 2. بناء المشروع (Build)
+- task: DotNetCoreCLI@2
+  displayName: 'Build the project'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+
+# 3. تشغيل الاختبارات (Test)
+- task: DotNetCoreCLI@2
+  displayName: 'Run Unit Tests'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests/*.csproj' # استهداف مشروع الاختبارات فقط
+    arguments: '--configuration $(buildConfiguration) --no-build'
