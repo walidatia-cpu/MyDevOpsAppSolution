@@ -1,0 +1,91 @@
+@model MyDevOpsApp.Models.EnableAuthenticatorViewModel
+@{
+    ViewData["Title"] = "تفعيل تطبيق المصادقة الثنائية (Authenticator)";
+}
+
+<div class="container" style="max-width: 620px; padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="panel-card" style="padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-glass);">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: var(--radius-md); background: var(--primary-gradient); color: #fff; font-size: 1.8rem; margin-bottom: 1rem; box-shadow: var(--shadow-glow);">
+                📱
+            </div>
+            <h1 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">
+                ربط وتفعيل تطبيق المصادقة (Authenticator)
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                اتبع الخطوات البسيطة التالية لتفعيل التحقق بخطوتين عبر هاتفك
+            </p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.5rem; color: #fca5a5; font-size: 0.9rem;">
+                <div asp-validation-summary="All" style="list-style: none; margin: 0; padding: 0;"></div>
+            </div>
+        }
+
+        <!-- خطوات التفعيل -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">
+                    1
+                </div>
+                <div>
+                    <strong style="display: block; font-size: 0.95rem; margin-bottom: 0.25rem;">تحميل تطبيق المصادقة على هاتفك:</strong>
+                    <span style="color: var(--text-secondary); font-size: 0.88rem;">
+                        قم بتنزيل تطبيق <strong>Google Authenticator</strong> أو <strong>Microsoft Authenticator</strong> مجاناً من متجر Google Play أو Apple App Store.
+                    </span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">
+                    2
+                </div>
+                <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.95rem; margin-bottom: 0.5rem;">إدخال مفتاح الأمان السري في التطبيق:</strong>
+                    <span style="color: var(--text-secondary); font-size: 0.88rem; display: block; margin-bottom: 0.75rem;">
+                        افتح التطبيق، اختر "إضافة حساب" ثم "إدخال مفتاح الإعداد (Enter a setup key)" وأدخل هذا المفتاح:
+                    </span>
+                    <div style="background: rgba(0, 0, 0, 0.35); border: 1px dashed rgba(99, 102, 241, 0.5); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 1.15rem; color: #38bdf8; letter-spacing: 2px; text-align: center; user-select: all;">
+                        @Model.SharedKey
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">
+                    3
+                </div>
+                <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.95rem; margin-bottom: 0.5rem;">تأكيد التفعيل بإدخال الرمز المولد:</strong>
+                    <span style="color: var(--text-secondary); font-size: 0.88rem; display: block; margin-bottom: 1rem;">
+                        أدخل الرمز المكون من 6 أرقام الظاهر في التطبيق الآن للتحقق والربط:
+                    </span>
+
+                    <form asp-action="EnableAuthenticator" method="post" id="enable-authenticator-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="SharedKey" />
+                        <input type="hidden" asp-for="AuthenticatorUri" />
+
+                        <div style="margin-bottom: 1.25rem;">
+                            <input asp-for="Code" class="form-control" autocomplete="off" placeholder="مثال: 123456" maxlength="7"
+                                   style="width: 100%; padding: 0.8rem 1rem; text-align: center; font-size: 1.3rem; letter-spacing: 4px; font-weight: 700; color: #34d399;" />
+                            <span asp-validation-for="Code" style="color: var(--danger); font-size: 0.82rem;"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-admin" style="width: 100%; padding: 0.85rem; font-size: 1.05rem; font-weight: 700;">
+                            ✨ تأكيد وتفعيل المصادقة الثنائية
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding-top: 1.25rem; border-top: 1px solid var(--border-color); text-align: center;">
+            <a asp-action="Manage2fa" style="color: var(--text-muted); font-size: 0.9rem; text-decoration: underline;">
+                إلغاء والعودة لإعدادات الأمان &larr;
+            </a>
+        </div>
+    </div>
+</div>

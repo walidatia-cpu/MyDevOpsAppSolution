@@ -6,8 +6,49 @@ using MyDevOpsApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. إعداد قاعدة البيانات SQLite
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=app.db";
+// 1. إعداد مسار وقاعدة بيانات SQLite الذكي (يدعم العمل المحلي و Azure App Service)
+var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=app.db";
+var sqliteBuilder = new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder(rawConnectionString);
+
+var homeEnv = Environment.GetEnvironmentVariable("HOME");
+var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+
+if (isAzure && !string.IsNullOrEmpty(homeEnv))
+{
+    // في Azure App Service، نضمن حفظ قاعدة البيانات داخل المسار الدائم القابل للكتابة /home/data أو D:\home\data
+    var azureDataDir = Path.Combine(homeEnv, "data");
+    Directory.CreateDirectory(azureDataDir);
+
+    var fileName = Path.GetFileName(sqliteBuilder.DataSource);
+    if (string.IsNullOrEmpty(fileName))
+    {
+        fileName = "app.db";
+    }
+
+    // إذا كان المسار نسبياً أو تم تمرير مسار Linux على بيئة Windows
+    if (!Path.IsPathRooted(sqliteBuilder.DataSource) || sqliteBuilder.DataSource.Contains("/home/data/"))
+    {
+        sqliteBuilder.DataSource = Path.Combine(azureDataDir, fileName);
+    }
+    else
+    {
+        var targetDir = Path.GetDirectoryName(sqliteBuilder.DataSource);
+        if (!string.IsNullOrEmpty(targetDir))
+        {
+            Directory.CreateDirectory(targetDir);
+        }
+    }
+}
+else
+{
+    var targetDir = Path.GetDirectoryName(sqliteBuilder.DataSource);
+    if (!string.IsNullOrEmpty(targetDir))
+    {
+        Directory.CreateDirectory(targetDir);
+    }
+}
+
+var connectionString = sqliteBuilder.ToString();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 
@@ -46,13 +87,14 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
+        logger.LogInformation("مسار قاعدة البيانات المستخدم: {DataSource}", sqliteBuilder.DataSource);
         await DbInitializer.InitializeAsync(services);
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "حدث خطأ أثناء تهيئة قاعدة البيانات ومستخدمي النظام.");
     }
 }

@@ -30,12 +30,15 @@
             @Html.AntiForgeryToken()
 
             <div style="margin-bottom: 1.25rem;">
-                <label asp-for="Email" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">
-                    البريد الإلكتروني
+                <label asp-for="LoginIdentifier" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    الرقم القومي أو البريد الإلكتروني
                 </label>
-                <input asp-for="Email" id="input-email" class="form-control" placeholder="name@company.com"
-                       style="width: 100%; padding: 0.8rem 1rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem; outline: none; transition: border-color var(--transition-fast);" />
-                <span asp-validation-for="Email" style="color: var(--danger); font-size: 0.8rem;"></span>
+                <input asp-for="LoginIdentifier" id="input-identifier" class="form-control" placeholder="الرقم القومي (14 رقم) أو name@company.com"
+                       style="width: 100%; padding: 0.8rem 1rem;" />
+                <span asp-validation-for="LoginIdentifier" style="color: var(--danger); font-size: 0.8rem;"></span>
+                <div style="font-size: 0.8rem; color: #a5b4fc; margin-top: 0.35rem;">
+                    💡 للموظفين: يمكنك كتابة رقمك القومي مباشرة للدخول.
+                </div>
             </div>
 
             <div style="margin-bottom: 1.25rem;">

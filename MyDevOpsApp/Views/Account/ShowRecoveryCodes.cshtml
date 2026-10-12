@@ -1,0 +1,36 @@
+@model MyDevOpsApp.Models.ShowRecoveryCodesViewModel
+@{
+    ViewData["Title"] = "أكواد الاسترداد للطوارئ (Recovery Codes)";
+}
+
+<div class="container" style="max-width: 600px; padding-top: 2.5rem; padding-bottom: 3rem;">
+    <div class="panel-card" style="padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid rgba(16, 185, 129, 0.4); text-align: center;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 2.2rem; margin-bottom: 1.25rem;">
+            ✅
+        </div>
+
+        <h1 style="font-size: 1.6rem; font-weight: 800; color: #34d399; margin-bottom: 0.5rem;">
+            تم تفعيل التحقق بخطوتين بنجاح!
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">
+            احتفظ بأكواد الاسترداد هذه في مكان آمن. في حال فقدت هاتفك أو تعذر الوصول لتطبيق المصادقة، يمكنك استخدام أي كود منها للدخول لحسابك (كل كود صالح لمرة واحدة).
+        </p>
+
+        <div style="background: rgba(0, 0, 0, 0.4); border: 1px dashed rgba(16, 185, 129, 0.5); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.75rem; text-align: center;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-family: monospace; font-size: 1.1rem; color: #6ee7b7; letter-spacing: 1px; user-select: all;">
+                @foreach (var code in Model.RecoveryCodes)
+                {
+                    <div style="background: rgba(255, 255, 255, 0.04); padding: 0.45rem; border-radius: var(--radius-sm);">
+                        @code
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a asp-action="Manage2fa" class="btn btn-admin" style="padding: 0.75rem 1.75rem; font-weight: 700;">
+                تم حفظ الأكواد &larr; متابعة
+            </a>
+        </div>
+    </div>
+</div>

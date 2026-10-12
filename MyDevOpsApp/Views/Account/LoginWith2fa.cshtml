@@ -1,0 +1,59 @@
+@model MyDevOpsApp.Models.LoginWith2faViewModel
+@{
+    ViewData["Title"] = "التحقق الثنائي (2FA)";
+}
+
+<div class="container" style="max-width: 500px; padding-top: 3rem; padding-bottom: 3rem;">
+    <div class="panel-card" style="padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-glass); text-align: center;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: var(--primary-gradient); color: #fff; font-size: 2rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-glow);">
+            🛡️
+        </div>
+
+        <h1 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">
+            التحقق بخطوتين (2FA)
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.75rem; line-height: 1.6;">
+            حسابك محمي بنظام التحقق الثنائي. يرجى إدخال رمز التحقق المكون من 6 أرقام من تطبيق المصادقة (Authenticator) على هاتفك.
+        </p>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.5rem; color: #fca5a5; font-size: 0.9rem; text-align: right;">
+                <div asp-validation-summary="All" style="list-style: none; margin: 0; padding: 0;"></div>
+            </div>
+        }
+
+        <form asp-action="LoginWith2fa" asp-route-returnUrl="@Model.ReturnUrl" method="post" id="form-2fa" style="text-align: right;">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RememberMe" />
+
+            <div style="margin-bottom: 1.5rem;">
+                <label asp-for="TwoFactorCode" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.92rem;">
+                    رمز التحقق (6 أرقام):
+                </label>
+                <input asp-for="TwoFactorCode" id="input-2fa-code" class="form-control" autocomplete="off" autofocus
+                       placeholder="مثال: 123456" maxlength="7"
+                       style="width: 100%; padding: 0.85rem 1rem; text-align: center; font-size: 1.4rem; letter-spacing: 6px; font-weight: 700; color: #38bdf8;" />
+                <span asp-validation-for="TwoFactorCode" style="color: var(--danger); font-size: 0.82rem;"></span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.75rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; color: var(--text-secondary);">
+                    <input asp-for="RememberMachine" type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);" />
+                    <span>تذكر هذا الجهاز (عدم طلب الرمز مرة أخرى على هذا المتصفح)</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; padding: 0.85rem; font-size: 1.05rem; background: var(--primary-gradient); color: #fff; box-shadow: var(--shadow-glow); font-weight: 700;">
+                تأكيد الدخول &larr;
+            </button>
+        </form>
+
+        <div style="margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-secondary);">
+            ليس لديك إمكانية الوصول لتطبيق المصادقة حالياً؟
+            <a asp-action="LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl" style="color: #38bdf8; text-decoration: underline; margin-right: 0.35rem;">
+                الدخول باستخدام كود الاسترداد للطوارئ &larr;
+            </a>
+        </div>
+    </div>
+</div>

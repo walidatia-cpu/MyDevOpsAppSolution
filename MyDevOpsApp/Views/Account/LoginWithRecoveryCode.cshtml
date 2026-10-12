@@ -1,0 +1,50 @@
+@model MyDevOpsApp.Models.LoginWithRecoveryCodeViewModel
+@{
+    ViewData["Title"] = "الدخول بكود الاسترداد";
+}
+
+<div class="container" style="max-width: 500px; padding-top: 3rem; padding-bottom: 3rem;">
+    <div class="panel-card" style="padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-glass); text-align: center;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 2rem; margin-bottom: 1.25rem; border: 1px solid rgba(245, 158, 11, 0.4);">
+            🔑
+        </div>
+
+        <h1 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">
+            التحقق بكود الاسترداد للطوارئ
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.75rem; line-height: 1.6;">
+            أدخل أحد أكواد الاسترداد الاحتياطية التي تم تزويدك بها عند تفعيل المصادقة الثنائية. كل كود صالح للاستخدام لمرة واحدة فقط.
+        </p>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.5rem; color: #fca5a5; font-size: 0.9rem; text-align: right;">
+                <div asp-validation-summary="All" style="list-style: none; margin: 0; padding: 0;"></div>
+            </div>
+        }
+
+        <form asp-action="LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl" method="post" id="form-recovery" style="text-align: right;">
+            @Html.AntiForgeryToken()
+
+            <div style="margin-bottom: 1.5rem;">
+                <label asp-for="RecoveryCode" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.92rem;">
+                    كود الاسترداد الاحتياطي:
+                </label>
+                <input asp-for="RecoveryCode" id="input-recovery-code" class="form-control" autocomplete="off" autofocus
+                       placeholder="مثال: XXXXX-XXXXX"
+                       style="width: 100%; padding: 0.85rem 1rem; text-align: center; font-size: 1.25rem; font-family: monospace; letter-spacing: 2px; color: #fbbf24;" />
+                <span asp-validation-for="RecoveryCode" style="color: var(--danger); font-size: 0.82rem;"></span>
+            </div>
+
+            <button type="submit" class="btn btn-admin" style="width: 100%; padding: 0.85rem; font-size: 1.05rem; font-weight: 700;">
+                دخول للنظام باستخدام الكود &larr;
+            </button>
+        </form>
+
+        <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 0.88rem;">
+            <a asp-action="LoginWith2fa" asp-route-returnUrl="@Model.ReturnUrl" style="color: #38bdf8; text-decoration: underline;">
+                العودة للتحقق برمز تطبيق المصادقة (Authenticator) &larr;
+            </a>
+        </div>
+    </div>
+</div>

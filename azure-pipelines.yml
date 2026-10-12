@@ -1,5 +1,9 @@
 trigger:
-- master
+  branches:
+    include:
+    - master
+    - main
+    - Sprint_1
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -84,6 +88,7 @@ stages:
               appType: 'webApp'
               WebAppName: '$(testWebAppName)'
               packageForLinux: '$(System.ArtifactsDirectory)/drop/**/*.zip'
+              appSettings: '-ASPNETCORE_ENVIRONMENT Production -WEBSITE_RUN_FROM_PACKAGE 0 -ConnectionStrings__DefaultConnection "Data Source=/home/data/app.db"'
 
 # ==========================================
 # المرحلة الثالثة: النشر لبيئة الإنتاج (CD - Production)
@@ -115,3 +120,4 @@ stages:
               appType: 'webApp'
               WebAppName: '$(prodWebAppName)'
               packageForLinux: '$(System.ArtifactsDirectory)/drop/**/*.zip'
+              appSettings: '-ASPNETCORE_ENVIRONMENT Production -WEBSITE_RUN_FROM_PACKAGE 0 -ConnectionStrings__DefaultConnection "Data Source=/home/data/app.db"'

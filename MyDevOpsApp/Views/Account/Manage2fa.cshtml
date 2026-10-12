@@ -1,0 +1,104 @@
+@model MyDevOpsApp.Models.Manage2faViewModel
+@{
+    ViewData["Title"] = "إعدادات المصادقة الثنائية (2FA)";
+}
+
+<div class="container" style="max-width: 680px; padding-top: 2rem; padding-bottom: 3rem;">
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #6ee7b7; display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 1.3rem;">✅</span>
+            <div>@Model.StatusMessage</div>
+        </div>
+    }
+
+    <div class="panel-card" style="padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-glass);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem;">
+            <div>
+                <h1 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.35rem;">
+                    🛡️ أمان الحساب والمصادقة الثنائية (2FA)
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 0.92rem;">
+                    حماية إضافية لحسابك تتطلب إدخال رمز أمان من هاتفك عند تسجيل الدخول.
+                </p>
+            </div>
+            <div>
+                @if (Model.Is2faEnabled)
+                {
+                    <span class="badge badge-success" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        مُفعلة ومحمية ✅
+                    </span>
+                }
+                else
+                {
+                    <span class="badge badge-warning" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        غير مفعلة ⚠️
+                    </span>
+                }
+            </div>
+        </div>
+
+        @if (Model.Is2faEnabled)
+        {
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 2rem;">
+                <h3 style="color: #6ee7b7; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    حسابك محمي بنجاح!
+                </h3>
+                <p style="color: #d1fae5; font-size: 0.92rem; line-height: 1.7; margin-bottom: 1rem;">
+                    في كل مرة تقوم فيها بتسجيل الدخول، سيطلب منك النظام رمز التحقق المولد من تطبيق المصادقة (Google Authenticator / Microsoft Authenticator) لحماية بيانات مرتبك ومستحقاتك.
+                </p>
+
+                <div style="font-size: 0.88rem; color: #a7f3d0;">
+                    أكواد الاسترداد المتبقية لديك: <strong>@Model.RecoveryCodesLeft</strong> كود.
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                <a asp-action="EnableAuthenticator" class="btn" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); color: #c7d2fe; padding: 0.75rem 1.25rem;">
+                    🔄 إعادة ضبط تطبيق المصادقة
+                </a>
+
+                <form asp-action="GenerateRecoveryCodes" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; padding: 0.75rem 1.25rem;">
+                        🔑 إنشاء أكواد استرداد جديدة
+                    </button>
+                </form>
+
+                <form asp-action="Disable2fa" method="post" onsubmit="return confirm('هل أنت متأكد من رغبتك في تعطيل المصادقة الثنائية؟ سيقلل هذا من أمان حسابك.');" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 0.75rem 1.25rem;">
+                        ❌ تعطيل المصادقة الثنائية
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 2rem;">
+                <h3 style="color: #fbbf24; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    المصادقة الثنائية غير مفعلة
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.25rem;">
+                    ننصح بتفعيل المصادقة الثنائية فوراً لحماية بياناتك المالية ومفردات الراتب، حيث يتطلب الدخول إثباتاً إضافياً بهاتفك بجانب كلمة المرور.
+                </p>
+
+                <a asp-action="EnableAuthenticator" class="btn btn-admin" style="padding: 0.75rem 1.5rem; font-weight: 700;">
+                    🚀 تفعيل المصادقة الثنائية الآن &larr;
+                </a>
+            </div>
+        }
+
+        <div style="padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+            <a asp-area="Employees" asp-controller="Dashboard" asp-action="Index" style="color: #38bdf8; text-decoration: underline;">
+                &larr; العودة لبوابة الموظف
+            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-area="Admin" asp-controller="Payroll" asp-action="Report" style="color: #c084fc; text-decoration: underline;">
+                    العودة للوحة الإدارة &larr;
+                </a>
+            }
+        </div>
+    </div>
+</div>

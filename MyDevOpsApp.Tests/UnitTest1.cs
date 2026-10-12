@@ -90,8 +90,39 @@ public class AccountModelTests
         };
 
         Assert.Equal("admin@mydevopsapp.com", model.Email);
+        Assert.Equal("admin@mydevopsapp.com", model.LoginIdentifier);
         Assert.Equal("Admin@123456", model.Password);
         Assert.True(model.RememberMe);
+    }
+
+    [Fact]
+    public void LoginViewModel_WithNationalId_InitializesCorrectly()
+    {
+        var model = new LoginViewModel
+        {
+            LoginIdentifier = "29010101234567",
+            Password = "Password123"
+        };
+
+        Assert.Equal("29010101234567", model.LoginIdentifier);
+        Assert.Equal("29010101234567", model.Email);
+    }
+
+    [Fact]
+    public void LoginWith2faViewModel_InitializesPropertiesCorrectly()
+    {
+        var model = new LoginWith2faViewModel
+        {
+            TwoFactorCode = "123456",
+            RememberMachine = true,
+            RememberMe = true,
+            ReturnUrl = "/Employees/Dashboard"
+        };
+
+        Assert.Equal("123456", model.TwoFactorCode);
+        Assert.True(model.RememberMachine);
+        Assert.True(model.RememberMe);
+        Assert.Equal("/Employees/Dashboard", model.ReturnUrl);
     }
 
     [Fact]

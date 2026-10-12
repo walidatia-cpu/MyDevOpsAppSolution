@@ -27,7 +27,7 @@
     <form method="get" asp-action="Index" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
         <div>
             <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">السنة:</label>
-            <select name="year" class="form-control" style="padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;">
+            <select name="year" class="form-control form-select">
                 @for (int y = DateTime.Now.Year + 1; y >= 2023; y--)
                 {
                     <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
@@ -37,7 +37,7 @@
 
         <div>
             <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">الشهر:</label>
-            <select name="month" class="form-control" style="padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;">
+            <select name="month" class="form-control form-select">
                 @for (int m = 1; m <= 12; m++)
                 {
                     <option value="@m" selected="@(m == Model.SelectedMonth)">@m</option>
@@ -47,7 +47,7 @@
 
         <div>
             <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">نوع الصرف:</label>
-            <select name="type" class="form-control" style="padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;">
+            <select name="type" class="form-control form-select">
                 <option value="مرتبات" selected="@(Model.SelectedPayrollType == "مرتبات")">مرتبات</option>
                 <option value="حوافز" selected="@(Model.SelectedPayrollType == "حوافز")">حوافز</option>
             </select>
