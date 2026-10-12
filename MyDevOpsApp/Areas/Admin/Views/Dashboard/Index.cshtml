@@ -1,0 +1,126 @@
+@model MyDevOpsApp.Areas.Admin.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "نظرة عامة وإحصائيات النظام";
+}
+
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+        لوحة تحكم المسؤول (Admin Dashboard)
+    </h1>
+    <p style="color: var(--text-secondary);">
+        مرحباً بك في مساحة الإدارة المركزية لمشروع MyDevOpsApp. تفاصيل صحة النظام ومؤشرات الأداء.
+    </p>
+</div>
+
+<!-- بطاقات المؤشرات الأساسية -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(109, 40, 217, 0.15); color: #c084fc;">
+            👥
+        </div>
+        <div class="metric-info">
+            <h4>إجمالي الموظفين</h4>
+            <div class="metric-value">@Model.TotalEmployees</div>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+            🚀
+        </div>
+        <div class="metric-info">
+            <h4>المشاريع النشطة</h4>
+            <div class="metric-value">@Model.ActiveProjects</div>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+            ⏳
+        </div>
+        <div class="metric-info">
+            <h4>الطلبات المعلقة</h4>
+            <div class="metric-value">@Model.PendingRequests</div>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+            🛡️
+        </div>
+        <div class="metric-info">
+            <h4>جاهزية النظام</h4>
+            <div class="metric-value">@Model.SystemUptimePercent%</div>
+        </div>
+    </div>
+</div>
+
+<!-- تقسيم الشبكة: الأنشطة وموارد السيرفر -->
+<div class="dashboard-grid">
+    <!-- سجل الأنشطة الأخير -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <h2 class="panel-title">🕒 آخر الأنشطة في النظام</h2>
+            <span class="badge badge-primary">تحديث لحظي</span>
+        </div>
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>الإجراء</th>
+                    <th>المستخدم</th>
+                    <th>الوقت</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var activity in Model.RecentActivities)
+                {
+                    <tr>
+                        <td style="font-weight: 600;">@activity.Action</td>
+                        <td style="color: var(--text-secondary);">@activity.User</td>
+                        <td style="color: var(--text-muted); font-size: 0.85rem;">@activity.Timestamp</td>
+                        <td>
+                            <span class="badge @activity.BadgeClass">ناجح</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- بطاقة صحة السيرفر والموارد -->
+    <div>
+        <div class="panel-card">
+            <div class="panel-header">
+                <h2 class="panel-title">🖥️ موارد السيرفر (Host Metrics)</h2>
+                <span class="badge badge-success">حالة ممتازة</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                @foreach (var metric in Model.ServerMetrics)
+                {
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.25rem;">
+                            <span>@metric.Name</span>
+                            <span style="font-weight: 600;">@metric.Usage</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar @metric.StatusColor" style="width: @(metric.ProgressPercent)%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="panel-card" style="background: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.2);">
+            <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: #a5b4fc;">⚡ إجراءات الإدارة السريعة</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem;">
+                <a asp-area="Admin" asp-controller="Employees" asp-action="Index" class="btn btn-admin" style="font-size: 0.85rem; padding: 0.6rem 1rem;">
+                    👤 عرض وإدارة الموظفين
+                </a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="btn" style="font-size: 0.85rem; padding: 0.6rem 1rem; background: rgba(255, 255, 255, 0.08); color: #fff;">
+                    🌐 العودة للبوابة الرئيسية
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

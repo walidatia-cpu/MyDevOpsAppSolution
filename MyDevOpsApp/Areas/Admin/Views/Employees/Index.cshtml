@@ -1,0 +1,71 @@
+@model IEnumerable<MyDevOpsApp.Areas.Admin.Models.EmployeeManagementModel>
+@{
+    ViewData["Title"] = "إدارة الموظفين - لوحة الإدارة";
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+            إدارة الموظفين (Employee Directory)
+        </h1>
+        <p style="color: var(--text-secondary);">
+            قائمة فريق العمل المصرح لهم بالدخول وصلاحياتهم الإدارية والتقنية.
+        </p>
+    </div>
+    <div>
+        <button class="btn btn-admin" id="btn-add-employee-modal" onclick="alert('خاصية إضافة موظف جديد متاحة عبر لوحة الإدارة')">
+            + إضافة موظف جديد
+        </button>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-header">
+        <h2 class="panel-title">👥 دليل الموظفين المسجلين في النظام</h2>
+        <span class="badge badge-primary">إجمالي: @Model.Count() موظفين</span>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="custom-table" id="table-employees-list">
+            <thead>
+                <tr>
+                    <th>المعرف (#)</th>
+                    <th>الاسم الكامل</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>القسم</th>
+                    <th>المسمى الوظيفي</th>
+                    <th>الحالة</th>
+                    <th>تاريخ الانضمام</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var emp in Model)
+                {
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: bold;">#@emp.Id</td>
+                        <td style="font-weight: 600;">@emp.FullName</td>
+                        <td style="color: var(--text-secondary); direction: ltr; text-align: right;">@emp.Email</td>
+                        <td><span class="badge badge-primary">@emp.Department</span></td>
+                        <td>@emp.Role</td>
+                        <td>
+                            @if (emp.Status == "نشط")
+                            {
+                                <span class="badge badge-success">نشط</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-warning">@emp.Status</span>
+                            }
+                        </td>
+                        <td style="color: var(--text-muted); font-size: 0.85rem;">@emp.JoinDate.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <a asp-area="Admin" asp-controller="Employees" asp-action="Details" asp-route-id="@emp.Id" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(255, 255, 255, 0.08); color: #fff;">
+                                تفاصيل
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

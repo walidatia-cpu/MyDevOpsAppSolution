@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - بوابة الموظفين (Employees)</title>
+    <meta name="description" content="بوابة الخدمة الذاتية للموظفين - MyDevOpsApp Employees Area" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="main-header">
+        <nav class="navbar" id="employee-top-navbar">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a class="brand-logo" asp-area="Employees" asp-controller="Dashboard" asp-action="Index">
+                    <span class="brand-badge" style="background: var(--employee-gradient);">Employee Portal</span>
+                    <span>بوابة الموظف</span>
+                </a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button id="btn-clock-in" class="btn" style="background: rgba(14, 165, 233, 0.2); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8; font-size: 0.85rem; padding: 0.45rem 1rem;">
+                    ⏱️ تسجيل الحضور اليومي
+                </button>
+                <span class="badge badge-info">👤 @(User.Identity?.Name ?? "موظف")</span>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link" id="link-employee-exit-portal">
+                    🌐 البوابة
+                </a>
+                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        خروج 🚪
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <div class="area-layout-container">
+        <!-- القائمة الجانبية للموظف -->
+        <aside class="area-sidebar" id="employee-sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-title">
+                    <span>💼 بوابة الموظفين</span>
+                </div>
+                <small style="color: var(--text-muted);">Area: /Employees [Protected]</small>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a asp-area="Employees" asp-controller="Dashboard" asp-action="Index" id="emp-menu-dashboard">
+                        💵 <span>مفردات المرتبات والحوافز</span>
+                    </a>
+                </li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="sidebar-menu-item">
+                        <a asp-area="Admin" asp-controller="Payroll" asp-action="Report" id="emp-menu-switch-admin">
+                            🛡️ <span>إدارة المرتبات (Admin)</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+            <div class="sidebar-footer">
+                <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--employee-accent);"></span>
+                    حساب الموظف متصل
+                </div>
+            </div>
+        </aside>
+
+        <!-- المحتوى الرئيسي للموظف -->
+        <main class="area-main-content" role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/js/site.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

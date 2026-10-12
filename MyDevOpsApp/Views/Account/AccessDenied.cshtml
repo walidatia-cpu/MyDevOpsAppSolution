@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "غير مصرح بالدخول - 403 Access Denied";
+}
+
+<div class="container" style="max-width: 650px; text-align: center; padding-top: 5rem;">
+    <div class="panel-card" style="border-color: rgba(239, 68, 68, 0.35); padding: 3rem 2rem;">
+        <div style="font-size: 3.5rem; margin-bottom: 1rem;">🚫</div>
+        <h1 style="color: var(--danger); font-size: 1.8rem; margin-bottom: 0.75rem;">
+            غير مصرح لك بالوصول إلى هذه الصفحة
+        </h1>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.8;">
+            حسابك الحالي لا يمتلك الصلاحيات الكافية (Role) للوصول إلى هذا القسم. تتطلب هذه الصفحة صلاحيات محددة مثل <strong>Admin</strong>.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a asp-controller="Account" asp-action="Login" class="btn" style="background: var(--primary-gradient); color: #fff;">
+                تسجيل الدخول بحساب مسؤول &larr;
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="btn" style="background: rgba(255, 255, 255, 0.08); color: #fff;">
+                العودة للرئيسية
+            </a>
+        </div>
+    </div>
+</div>

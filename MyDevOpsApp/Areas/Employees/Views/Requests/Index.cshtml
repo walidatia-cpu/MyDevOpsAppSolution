@@ -1,0 +1,55 @@
+@model IEnumerable<MyDevOpsApp.Areas.Employees.Models.LeaveRequestModel>
+@{
+    ViewData["Title"] = "طلبات الإجازات والأذونات - بوابة الموظفين";
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+            طلبات الإجازات والأذونات
+        </h1>
+        <p style="color: var(--text-secondary);">
+            سجل طلبات الإجازات السنوية والمرضية والعمل عن بعد.
+        </p>
+    </div>
+    <div>
+        <button class="btn btn-employee" onclick="alert('نموذج تقديم الطلب متاح عبر الخدمة الذاتية')">
+            + تقديم طلب جديد
+        </button>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-header">
+        <h2 class="panel-title">📄 سجل الطلبات السابقة والحالية</h2>
+        <span class="badge badge-info">إجمالي الطلبات: @Model.Count()</span>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>المعرف (#)</th>
+                    <th>نوع الطلب</th>
+                    <th>تاريخ البدء</th>
+                    <th>تاريخ الانتهاء</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var req in Model)
+                {
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: bold;">#@req.Id</td>
+                        <td style="font-weight: 600;">@req.RequestType</td>
+                        <td style="color: var(--text-secondary);">@req.StartDate</td>
+                        <td style="color: var(--text-secondary);">@req.EndDate</td>
+                        <td>
+                            <span class="badge @req.BadgeClass">@req.Status</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

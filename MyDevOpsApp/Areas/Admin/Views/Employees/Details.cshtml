@@ -1,0 +1,47 @@
+@model MyDevOpsApp.Areas.Admin.Models.EmployeeManagementModel
+@{
+    ViewData["Title"] = "تفاصيل الموظف - " + Model.FullName;
+}
+
+<div style="margin-bottom: 2rem;">
+    <a asp-area="Admin" asp-controller="Employees" asp-action="Index" class="btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.85rem;">
+        &rarr; العودة لقائمة الموظفين
+    </a>
+    <h1 style="font-size: 1.8rem; font-weight: 800;">
+        ملف الموظف: @Model.FullName
+    </h1>
+</div>
+
+<div class="panel-card" style="max-width: 800px;">
+    <div class="panel-header">
+        <h2 class="panel-title">📋 بيانات الموظف والصلاحيات</h2>
+        <span class="badge @(Model.Status == "نشط" ? "badge-success" : "badge-warning")">@Model.Status</span>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem; display: block;">الاسم الكامل</label>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">@Model.FullName</div>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem; display: block;">البريد الإلكتروني المؤسسي</label>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem; direction: ltr; text-align: right;">@Model.Email</div>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem; display: block;">القسم / الإدارة</label>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">@Model.Department</div>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem; display: block;">الدور الوظيفي</label>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">@Model.Role</div>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem; display: block;">تاريخ التعيين</label>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">@Model.JoinDate.ToString("yyyy-MM-dd")</div>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem; display: block;">صلاحيات الوصول إلى الـ Area</label>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem; color: var(--primary);">Areas/Employees + Areas/Admin</div>
+        </div>
+    </div>
+</div>

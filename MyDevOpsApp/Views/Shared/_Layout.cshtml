@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - بوابة الاستعلام عن المرتبات والحوافز</title>
+    <meta name="description" content="المنظومة الرقمية للاستعلام عن مسيرات وكشوف المرتبات والحوافز الشهرية ومفردات المرتب" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="main-header">
+        <nav class="navbar" id="main-navigation">
+            <a class="brand-logo" id="nav-brand-logo" asp-area="" asp-controller="Home" asp-action="Index">
+                <span class="brand-badge" style="background: var(--primary-gradient);">الرواتب والأجور 💵</span>
+                <span>بوابة الاستعلام عن المرتبات والحوافز</span>
+            </a>
+            <ul class="nav-links">
+                <li><a class="nav-link" id="nav-link-home" asp-area="" asp-controller="Home" asp-action="Index">الرئيسية 🏠</a></li>
+                <li><a class="nav-link btn-area-employee" id="nav-link-employee-area" asp-area="Employees" asp-controller="Dashboard" asp-action="Index">بوابة الموظف (استعلام المرتب) 💼</a></li>
+                <li><a class="nav-link btn-area-admin" id="nav-link-admin-area" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">إدارة الرواتب (الماليات) ⚡</a></li>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: #a5b4fc; background: rgba(99, 102, 241, 0.1); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(99, 102, 241, 0.2);">
+                            👤 @User.Identity.Name
+                        </span>
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                خروج 🚪
+                            </button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a asp-area="" asp-controller="Account" asp-action="Login" class="btn" style="background: var(--primary-gradient); color: #fff; padding: 0.45rem 1.1rem; font-size: 0.9rem; box-shadow: var(--shadow-glow);">
+                            تسجيل الدخول 🔐
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; @DateTime.Now.Year - البوابة الرقمية للاستعلام عن المرتبات والمستحقات المالية - سرية تامة وأمان كامل لكافة البيانات</p>
+    </footer>
+
+    <script src="~/js/site.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
