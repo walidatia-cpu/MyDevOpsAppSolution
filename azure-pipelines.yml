@@ -88,7 +88,7 @@ stages:
               appType: 'webApp'
               WebAppName: '$(testWebAppName)'
               packageForLinux: '$(System.ArtifactsDirectory)/drop/**/*.zip'
-              appSettings: '-ASPNETCORE_ENVIRONMENT Production -WEBSITE_RUN_FROM_PACKAGE 0 -ConnectionStrings__DefaultConnection "Data Source=/home/data/app.db"'
+              appSettings: '-ASPNETCORE_ENVIRONMENT Production -ConnectionStrings__DefaultConnection "Data Source=/home/data/app.db" -WEBSITE_RUN_FROM_PACKAGE 1'
 
 # ==========================================
 # المرحلة الثالثة: النشر لبيئة الإنتاج (CD - Production)
@@ -120,4 +120,4 @@ stages:
               appType: 'webApp'
               WebAppName: '$(prodWebAppName)'
               packageForLinux: '$(System.ArtifactsDirectory)/drop/**/*.zip'
-              appSettings: '-ASPNETCORE_ENVIRONMENT Production -WEBSITE_RUN_FROM_PACKAGE 0 -ConnectionStrings__DefaultConnection "Data Source=/home/data/app.db"'
+              appSettings: '-ASPNETCORE_ENVIRONMENT Production -ConnectionStrings__DefaultConnection "Data Source=/home/data/app.db" -WEBSITE_RUN_FROM_PACKAGE 1'
