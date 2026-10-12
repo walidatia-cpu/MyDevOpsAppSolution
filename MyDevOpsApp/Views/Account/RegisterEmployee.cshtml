@@ -1,0 +1,91 @@
+@model MyDevOpsApp.Models.RegisterEmployeeViewModel
+@{
+    ViewData["Title"] = "تسجيل حساب موظف جديد";
+}
+
+<div class="container" style="max-width: 540px; padding-top: 2.5rem; padding-bottom: 3rem;">
+    <div class="panel-card" style="padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-glass);">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: var(--radius-md); background: var(--employee-gradient); color: #fff; font-size: 1.8rem; margin-bottom: 1rem; box-shadow: 0 4px 20px rgba(2, 132, 199, 0.4);">
+                👥
+            </div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem;">
+                تسجيل حساب موظف جديد
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                أدخل رقمك القومي ورقم الملف للربط التلقائي ببيانات مسير المرتبات والحوافز
+            </p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.5rem; color: #fca5a5; font-size: 0.9rem;">
+                <div asp-validation-summary="All" style="list-style: none; margin: 0; padding: 0;"></div>
+            </div>
+        }
+
+        <form asp-action="RegisterEmployee" method="post" id="register-employee-form">
+            @Html.AntiForgeryToken()
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div>
+                    <label asp-for="NationalId" style="display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem;">
+                        الرقم القومي (14 رقم):
+                    </label>
+                    <input asp-for="NationalId" class="form-control" placeholder="2901010..."
+                           style="width: 100%; padding: 0.75rem 0.9rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem; direction: ltr;" />
+                    <span asp-validation-for="NationalId" style="color: var(--danger); font-size: 0.8rem;"></span>
+                </div>
+
+                <div>
+                    <label asp-for="PaymentNumber" style="display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem;">
+                        رقم الملف / الصرف:
+                    </label>
+                    <input asp-for="PaymentNumber" class="form-control" placeholder="مثال: 1234"
+                           style="width: 100%; padding: 0.75rem 0.9rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem; direction: ltr;" />
+                    <span asp-validation-for="PaymentNumber" style="color: var(--danger); font-size: 0.8rem;"></span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <label asp-for="Email" style="display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem;">
+                    البريد الإلكتروني لتسجيل الدخول:
+                </label>
+                <input asp-for="Email" class="form-control" placeholder="your.name@company.com"
+                       style="width: 100%; padding: 0.75rem 0.9rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;" />
+                <span asp-validation-for="Email" style="color: var(--danger); font-size: 0.8rem;"></span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.75rem;">
+                <div>
+                    <label asp-for="Password" style="display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem;">
+                        كلمة المرور:
+                    </label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="••••••••"
+                           style="width: 100%; padding: 0.75rem 0.9rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;" />
+                    <span asp-validation-for="Password" style="color: var(--danger); font-size: 0.8rem;"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ConfirmPassword" style="display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem;">
+                        تأكيد كلمة المرور:
+                    </label>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="••••••••"
+                           style="width: 100%; padding: 0.75rem 0.9rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;" />
+                    <span asp-validation-for="ConfirmPassword" style="color: var(--danger); font-size: 0.8rem;"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-employee" style="width: 100%; padding: 0.85rem; font-size: 1.05rem; justify-content: center;">
+                ✨ التحقق وإنشاء الحساب
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-secondary);">
+            لديك حساب مسجل بالفعل؟
+            <a asp-action="Login" style="color: #38bdf8; font-weight: 600; text-decoration: underline; margin-right: 0.25rem;">
+                تسجيل الدخول هنا &larr;
+            </a>
+        </div>
+    </div>
+</div>

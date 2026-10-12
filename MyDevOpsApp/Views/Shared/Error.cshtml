@@ -1,0 +1,26 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "خطأ في النظام";
+}
+
+<div class="container" style="max-width: 700px; text-align: center; padding-top: 4rem;">
+    <div class="panel-card" style="border-color: rgba(239, 68, 68, 0.3);">
+        <h1 style="color: var(--danger); font-size: 2rem; margin-bottom: 1rem;">حدث خطأ أثناء معالجة الطلب</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            عذراً، تعذر إتمام العملية المطلوبة حالياً. تم تسجيل الخطأ لإجراء المراجعة.
+        </p>
+
+        @if (Model.ShowRequestId)
+        {
+            <p style="color: var(--text-muted); font-family: monospace;">
+                معرف الطلب (Request ID): <code>@Model.RequestId</code>
+            </p>
+        }
+
+        <div style="margin-top: 2rem;">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn" style="background: var(--surface-card-hover); color: var(--text-primary);">
+                العودة للرئيسية
+            </a>
+        </div>
+    </div>
+</div>

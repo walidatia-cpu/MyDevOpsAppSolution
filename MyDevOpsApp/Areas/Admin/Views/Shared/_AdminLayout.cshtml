@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - لوحة إدارة المرتبات والحوافز</title>
+    <meta name="description" content="إدارة رفع ومراجعة كشوف المرتبات والحوافز - MyDevOpsApp Admin Area" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/datatables/jquery.dataTables.min.css" />
+</head>
+<body>
+    <header class="main-header">
+        <nav class="navbar" id="admin-top-navbar">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a class="brand-logo" asp-area="Admin" asp-controller="Payroll" asp-action="Report">
+                    <span class="brand-badge" style="background: var(--admin-gradient);">نظام الرواتب والأجور</span>
+                    <span>إدارة المرتبات والحوافز</span>
+                </a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span class="badge badge-primary">🛡️ @(User.Identity?.Name ?? "مدير النظام")</span>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link" id="link-admin-exit-portal">
+                    🌐 البوابة
+                </a>
+                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        خروج 🚪
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <div class="area-layout-container">
+        <!-- القائمة الجانبية للأدمن -->
+        <aside class="area-sidebar" id="admin-sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-title">
+                    <span>⚡ إدارة الأجور والمرتبات</span>
+                </div>
+                <small style="color: var(--text-muted);">Area: /Admin</small>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a asp-area="Admin" asp-controller="Payroll" asp-action="Report" id="admin-menu-report">
+                        📊 <span>تقرير وإجماليات الشهر</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a asp-area="Admin" asp-controller="Payroll" asp-action="Upload" id="admin-menu-upload">
+                        📤 <span>رفع ملف مرتبات / حوافز</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a asp-area="Admin" asp-controller="Payroll" asp-action="Batches" id="admin-menu-batches">
+                        📁 <span>سجل الملفات المرفوعة</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a asp-area="Employees" asp-controller="Dashboard" asp-action="Index" id="admin-menu-switch-employee">
+                        👤 <span>الانتقال لبوابة الموظف</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success);"></span>
+                    جلسة المسؤول نشطة
+                </div>
+            </div>
+        </aside>
+
+        <!-- المحتوى الرئيسي للأدمن -->
+        <main class="area-main-content" role="main">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #6ee7b7; display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.3rem;">✅</span>
+                    <div>@TempData["SuccessMessage"]</div>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/js/site.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

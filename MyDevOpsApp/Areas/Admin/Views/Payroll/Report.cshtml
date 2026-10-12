@@ -1,0 +1,422 @@
+@model MyDevOpsApp.Areas.Admin.Models.PayrollReportViewModel
+@{
+    ViewData["Title"] = $"تقرير صرفيات {Model.SelectedPayrollType} - شهر {Model.SelectedMonth}/{Model.SelectedYear}";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #6ee7b7; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.3rem;">✅</span>
+        <div>@TempData["SuccessMessage"]</div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #fca5a5; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.3rem;">⚠️</span>
+        <div>@TempData["ErrorMessage"]</div>
+    </div>
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.35rem;">
+            📊 تقرير وإجماليات صرفيات شهر @Model.SelectedMonth / @Model.SelectedYear
+        </h1>
+        <p style="color: var(--text-secondary);">
+            عرض إجماليات الاستحقاقات والاستقطاعات وصافي الصرف وقائمة الموظفين مع تفاصيل مفردات كل موظف.
+        </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        @if (Model.CurrentBatch != null)
+        {
+            <button type="button" onclick="openDeleteMonthModal()" class="btn"
+                    style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171;">
+                🗑️ حذف بيانات هذا الشهر بالكامل
+            </button>
+        }
+        <a asp-action="Upload" class="btn btn-admin">
+            📤 رفع ملف جديد &larr;
+        </a>
+    </div>
+</div>
+
+<!-- شريط الفلترة واختيار الشهر والسنة ونوع الملف والبحث -->
+<div class="panel-card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem;">
+    <form method="get" asp-action="Report" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">السنة:</label>
+            <select name="year" class="form-control form-select">
+                @for (int y = DateTime.Now.Year + 1; y >= 2023; y--)
+                {
+                    <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">الشهر:</label>
+            <select name="month" class="form-control form-select">
+                @for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m" selected="@(m == Model.SelectedMonth)">@m</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">النوع:</label>
+            <select name="type" class="form-control form-select">
+                <option value="مرتبات" selected="@(Model.SelectedPayrollType == "مرتبات")">مرتبات</option>
+                <option value="حوافز" selected="@(Model.SelectedPayrollType == "حوافز")">حوافز</option>
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 220px;">
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">بحث (الاسم / رقم الملف / الرقم القومي):</label>
+            <input type="text" name="search" value="@Model.SearchQuery" placeholder="اكتب اسم الموظف أو رقمه القومي..."
+                   style="width: 100%; padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;" />
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-admin" style="padding: 0.55rem 1.25rem;">
+                🔍 تصفية وعرض
+            </button>
+        </div>
+    </form>
+</div>
+
+@if (Model.CurrentBatch == null)
+{
+    <div class="panel-card" style="text-align: center; padding: 4rem 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📂</div>
+        <h3 style="font-size: 1.4rem; margin-bottom: 0.75rem;">لا توجد بيانات مسجلة لـ (@Model.SelectedPayrollType) شهر @Model.SelectedMonth / @Model.SelectedYear</h3>
+        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem auto;">
+            لم يتم رفع ملف إكسيل لهذه الصرفية بعد، أو ربما تم حذفها. يمكنك رفع الملف وسيقوم النظام بتفريغ وحساب الإجماليات فوراً.
+        </p>
+        <a asp-action="Upload" class="btn btn-admin">
+            📤 رفع ملف شهر @Model.SelectedMonth / @Model.SelectedYear الآن
+        </a>
+    </div>
+}
+else
+{
+    <!-- بطاقات الإجماليات للشهر المحدد -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc;">
+                👥
+            </div>
+            <div class="metric-info">
+                <h4>عدد الموظفين</h4>
+                <div class="metric-value">@Model.TotalEmployeesCount</div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                📈
+            </div>
+            <div class="metric-info">
+                <h4>إجمالي الاستحقاقات</h4>
+                <div class="metric-value" style="font-size: 1.4rem;">@Model.TotalEarnings.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                📉
+            </div>
+            <div class="metric-info">
+                <h4>إجمالي الاستقطاعات</h4>
+                <div class="metric-value" style="font-size: 1.4rem;">@Model.TotalDeductions.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8;">
+                💵
+            </div>
+            <div class="metric-info">
+                <h4>صافي الصرف (الصافي)</h4>
+                <div class="metric-value" style="font-size: 1.4rem; color: #38bdf8;">@Model.TotalNet.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول الموظفين المسجلين في هذا الشهر -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <h2 class="panel-title">
+                📋 قائمة الموظفين وتفاصيل الصرفية (@Model.FilteredRecords.Count موظف)
+            </h2>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <span class="badge badge-primary">الملف: @Model.CurrentBatch.OriginalFileName</span>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="custom-table" id="table-payroll-records">
+                <thead>
+                    <tr>
+                        <th>رقم الصرف</th>
+                        <th>الرقم القومي</th>
+                        <th>اسم الموظف</th>
+                        <th>الإدارة / القسم</th>
+                        <th>الدرجة</th>
+                        <th>إجمالي الاستحقاقات</th>
+                        <th>إجمالي الاستقطاعات</th>
+                        <th>صافي الصرف</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rec in Model.FilteredRecords)
+                    {
+                        <tr>
+                            <td style="font-weight: 700; color: #a5b4fc;">#@rec.PaymentNumber</td>
+                            <td style="direction: ltr; text-align: right; color: var(--text-secondary); font-family: monospace;">@rec.NationalId</td>
+                            <td style="font-weight: 600;">@rec.EmployeeName</td>
+                            <td style="color: var(--text-secondary); font-size: 0.88rem;">@rec.Department</td>
+                            <td><span class="badge badge-info">@rec.Grade</span></td>
+                            <td style="color: var(--success); font-weight: 600;">@rec.TotalEarnings.ToString("N2")</td>
+                            <td style="color: var(--danger); font-weight: 600;">@rec.TotalDeductions.ToString("N2")</td>
+                            <td style="color: #38bdf8; font-weight: 700; font-size: 1.05rem;">@rec.NetAmount.ToString("N2")</td>
+                            <td>
+                                <a asp-action="RecordDetails" asp-route-id="@rec.Id" class="btn"
+                                   style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); color: #c7d2fe;">
+                                    تفاصيل الإجمالي 🔍
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- نافذة تأكيد حذف بيانات الشهر (Delete Month Confirmation Modal) -->
+@if (Model.CurrentBatch != null)
+{
+    <div id="delete-month-modal" onclick="onModalBackdropClick(event)" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem;">
+        <div id="delete-modal-card" class="panel-card" style="max-width: 530px; width: 100%; border-color: rgba(239, 68, 68, 0.5); padding: 2.25rem; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8); text-align: center; position: relative;">
+            
+            <!-- محتوى التأكيد الأساسي -->
+            <div id="delete-modal-content">
+                <div style="font-size: 3.2rem; margin-bottom: 0.75rem;">⚠️</div>
+                <h3 style="font-size: 1.45rem; color: #f87171; font-weight: 800; margin-bottom: 0.75rem;">
+                    تأكيد حذف بيانات شهر @Model.SelectedMonth / @Model.SelectedYear
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                    هل أنت متأكد من رغبتك في حذف كافة بيانات صرفية (<strong>@Model.SelectedPayrollType</strong>) لشهر <strong>@Model.SelectedMonth / @Model.SelectedYear</strong>؟
+                    <br />
+                    <span style="color: #fca5a5; font-size: 0.88rem; display: block; margin-top: 0.35rem;">
+                        سيتم مسح كشوف @Model.FilteredRecords.Count موظف وجميع بنودهم ومفرداتهم فوراً، لإتاحة إعادة رفع الملف نظيفاً.
+                    </span>
+                </p>
+
+                <div id="delete-error-alert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 0.75rem; color: #fca5a5; font-size: 0.9rem; margin-bottom: 1.25rem; text-align: center;"></div>
+
+                <form id="delete-month-form" asp-area="Admin" asp-controller="Payroll" asp-action="DeleteMonthData" method="post" onsubmit="handleDeleteMonthSubmit(event)" style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="year" value="@Model.SelectedYear" />
+                    <input type="hidden" name="month" value="@Model.SelectedMonth" />
+                    <input type="hidden" name="type" value="@Model.SelectedPayrollType" />
+
+                    <button type="submit" id="btn-confirm-delete" class="btn" style="background: var(--danger); color: #fff; padding: 0.75rem 1.6rem; font-weight: 700; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-width: 190px;">
+                        <span id="delete-btn-spinner" style="display: none; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+                        <span id="delete-btn-text">نعم، حذف البيانات نهائياً 🗑️</span>
+                    </button>
+                    <button type="button" id="btn-cancel-delete" onclick="closeDeleteMonthModal()" class="btn" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); padding: 0.75rem 1.25rem; border-radius: var(--radius-sm);">
+                        إلغاء التراجع
+                    </button>
+                </form>
+
+                <div id="delete-progress-indicator" style="display: none; margin-top: 1.25rem; font-size: 0.9rem; color: #38bdf8;">
+                    ⏳ جاري مسح كشوف الموظفين وبنودهم من قاعدة البيانات فوراً...
+                </div>
+            </div>
+
+            <!-- شاشة النجاح اللحظية -->
+            <div id="delete-success-content" style="display: none;">
+                <div style="font-size: 3.5rem; margin-bottom: 0.75rem;">✅</div>
+                <h3 style="font-size: 1.45rem; color: #34d399; font-weight: 800; margin-bottom: 0.5rem;">
+                    تم مسح بيانات الشهر بنجاح!
+                </h3>
+                <p id="delete-success-message" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem;">
+                    تم حذف كافة السجلات والبنود بنجاح.
+                </p>
+                <div style="color: #a5b4fc; font-size: 0.85rem;">
+                    🔄 جاري تحديث الصفحة والتقرير الآن...
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <style>
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        let isDeleting = false;
+
+        function openDeleteMonthModal() {
+            const modal = document.getElementById('delete-month-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // إعادة ضبط الحالات
+                const content = document.getElementById('delete-modal-content');
+                const successContent = document.getElementById('delete-success-content');
+                const errorAlert = document.getElementById('delete-error-alert');
+                const progress = document.getElementById('delete-progress-indicator');
+                const btn = document.getElementById('btn-confirm-delete');
+                const cancelBtn = document.getElementById('btn-cancel-delete');
+                const spinner = document.getElementById('delete-btn-spinner');
+                const btnText = document.getElementById('delete-btn-text');
+
+                if (content) content.style.display = 'block';
+                if (successContent) successContent.style.display = 'none';
+                if (errorAlert) errorAlert.style.display = 'none';
+                if (progress) progress.style.display = 'none';
+                if (spinner) spinner.style.display = 'none';
+                if (btn) {
+                    btn.disabled = false;
+                    if (btnText) btnText.innerText = 'نعم، حذف البيانات نهائياً 🗑️';
+                }
+                if (cancelBtn) cancelBtn.disabled = false;
+                isDeleting = false;
+            }
+        }
+
+        function closeDeleteMonthModal() {
+            if (isDeleting) return; // عدم الإغلاق أثناء المعالجة
+            const modal = document.getElementById('delete-month-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function onModalBackdropClick(e) {
+            if (e.target.id === 'delete-month-modal' && !isDeleting) {
+                closeDeleteMonthModal();
+            }
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !isDeleting) {
+                closeDeleteMonthModal();
+            }
+        });
+
+        async function handleDeleteMonthSubmit(e) {
+            e.preventDefault();
+            if (isDeleting) return;
+
+            const form = e.target;
+            const btn = document.getElementById('btn-confirm-delete');
+            const cancelBtn = document.getElementById('btn-cancel-delete');
+            const spinner = document.getElementById('delete-btn-spinner');
+            const btnText = document.getElementById('delete-btn-text');
+            const progress = document.getElementById('delete-progress-indicator');
+            const errorAlert = document.getElementById('delete-error-alert');
+
+            isDeleting = true;
+            if (btn) btn.disabled = true;
+            if (cancelBtn) cancelBtn.disabled = true;
+            if (spinner) spinner.style.display = 'inline-block';
+            if (btnText) btnText.innerText = 'جاري الحذف...';
+            if (progress) progress.style.display = 'block';
+            if (errorAlert) errorAlert.style.display = 'none';
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (response.ok) {
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        const data = await response.json();
+                        if (data.success) {
+                            // إظهار شاشة النجاح
+                            document.getElementById('delete-modal-content').style.display = 'none';
+                            document.getElementById('delete-success-content').style.display = 'block';
+                            if (data.message) {
+                                document.getElementById('delete-success-message').innerText = data.message;
+                            }
+                            // تحديث الصفحة تلقائياً
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 700);
+                            return;
+                        } else {
+                            if (errorAlert) {
+                                errorAlert.innerText = data.message || 'حدث خطأ أثناء حذف البيانات.';
+                                errorAlert.style.display = 'block';
+                            }
+                        }
+                    } else {
+                        // في حال استجاب الخادم بإعادة توجيه عادية
+                        window.location.reload();
+                        return;
+                    }
+                } else {
+                    if (errorAlert) {
+                        errorAlert.innerText = 'فشل الاتصال بالخادم، يرجى إعادة المحاولة.';
+                        errorAlert.style.display = 'block';
+                    }
+                }
+            } catch (err) {
+                if (errorAlert) {
+                    errorAlert.innerText = 'حدث خطأ: ' + err.message;
+                    errorAlert.style.display = 'block';
+                }
+            } finally {
+                isDeleting = false;
+                if (btn) btn.disabled = false;
+                if (cancelBtn) cancelBtn.disabled = false;
+                if (spinner) spinner.style.display = 'none';
+                if (btnText) btnText.innerText = 'نعم، حذف البيانات نهائياً 🗑️';
+                if (progress) progress.style.display = 'none';
+            }
+        }
+
+        // تفعيل DataTables لجدول كشوف المرتبات
+        $(document).ready(function () {
+            if ($('#table-payroll-records').length) {
+                $('#table-payroll-records').DataTable({
+                    language: {
+                        search: "🔍 بحث فوري في الكشف:",
+                        searchPlaceholder: "اسم الموظف، الرقم القومي، الإدارة...",
+                        lengthMenu: "عرض _MENU_ موظف لكل صفحة",
+                        info: "عرض _START_ إلى _END_ من أصل _TOTAL_ موظف",
+                        infoEmpty: "لا توجد سجلات",
+                        infoFiltered: "(تمت التصفية من أصل _MAX_ موظف)",
+                        zeroRecords: "لم يتم العثور على أية نتائج مطابقة",
+                        paginate: {
+                            first: "الأول",
+                            previous: "السابق",
+                            next: "التالي",
+                            last: "الأخير"
+                        }
+                    },
+                    pageLength: 25,
+                    lengthMenu: [10, 25, 50, 100, 250],
+                    responsive: true,
+                    order: [[0, "asc"]],
+                    columnDefs: [
+                        { orderable: false, targets: [8] } // عمود تفاصيل الإجمالي لا يحتاج ترتيب
+                    ]
+                });
+            }
+        });
+    </script>
+}

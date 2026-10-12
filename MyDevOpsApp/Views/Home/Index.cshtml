@@ -1,0 +1,207 @@
+@{
+    ViewData["Title"] = "الرئيسية - بوابة الاستعلام عن المرتبات والحوافز";
+}
+
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+    <!-- Hero Section -->
+    <section class="hero-section" style="padding-bottom: 3rem;">
+        <div class="hero-pill">
+            <span>✨ المنظومة الرقمية للرواتب والمستحقات المالية</span>
+        </div>
+        
+        <h1 class="hero-title" style="margin-bottom: 1.5rem;">
+            بوابة الاستعلام عن <span class="gradient-text">المرتبات والحوافز</span>
+        </h1>
+        
+        <p class="hero-subtitle" style="font-size: 1.15rem; line-height: 1.8; max-width: 780px;">
+            المنصة الإلكترونية الموحدة لتمكين كافة الموظفين من الاستعلام السريع والمؤمن عن تفاصيل مفردات المرتب، كشوف الاستحقاقات والاستقطاعات، وصافي الصرف الشهري مع إمكانية طباعة إشعار الصرف الرسمي.
+        </p>
+
+        <!-- أزرار الإجراء السريع -->
+        <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 3.5rem;">
+            <a asp-area="Employees" asp-controller="Dashboard" asp-action="Index" class="btn btn-area-employee" style="padding: 0.85rem 1.85rem; font-size: 1.05rem; font-weight: 700;">
+                💼 استعلام الموظف عن مفردات الراتب &larr;
+            </a>
+            <a asp-controller="Account" asp-action="RegisterEmployee" class="btn" style="padding: 0.85rem 1.5rem; font-size: 1rem; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: #fff;">
+                📝 تسجيل وتفعيل حساب موظف جديد
+            </a>
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-area-admin" style="padding: 0.85rem 1.5rem; font-size: 1rem;">
+                🛡️ بوابة الشؤون المالية والإدارة ⚙️
+            </a>
+        </div>
+
+        <!-- كروت البوابات الرئيسية (Main Gateway Cards) -->
+        <div class="areas-grid" style="text-align: right;">
+            <!-- كارت بوابة الموظف -->
+            <div class="area-card employee-card" id="card-employee-portal" style="border-color: rgba(2, 132, 199, 0.35);">
+                <div>
+                    <div class="area-card-header">
+                        <div class="card-icon employee-icon" style="background: rgba(2, 132, 199, 0.15); color: #38bdf8; font-size: 2rem;">
+                            💼
+                        </div>
+                        <div>
+                            <h2 class="card-title" style="font-size: 1.4rem;">بوابة الموظف للخدمة الذاتية</h2>
+                            <span class="badge badge-info" style="margin-top: 0.25rem;">استعلام فوري عن المستحقات</span>
+                        </div>
+                    </div>
+                    
+                    <p class="card-desc" style="font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                        خدمة إلكترونية مخصصة تتيح للموظف الاطلاع المباشر على تفاصيل كشوف المرتبات الشهرية ومسيرات الحوافز الخاصة به بسرية تامة.
+                    </p>
+
+                    <ul class="card-features" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; list-style: none; padding: 0;">
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #38bdf8;">💵</span>
+                            <span><strong>مفردات الاستحقاقات:</strong> تفصيل أساسي الراتب، البدلات، الحوافز، والمكافآت.</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #f87171;">📉</span>
+                            <span><strong>بيان الاستقطاعات:</strong> حصر التأمينات، الضرائب، السلف، والجزاءات بدقة.</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #34d399;">🖨️</span>
+                            <span><strong>طباعة إشعار الراتب:</strong> استخراج كشف راتب رسمي قابل للطباعة بصافي الصرف.</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #a5b4fc;">🔒</span>
+                            <span><strong>توثيق الهوية:</strong> ربط فوري ومشفر بالرقم القومي ورقم الملف المالي.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <a asp-area="Employees" asp-controller="Dashboard" asp-action="Index" class="btn btn-employee" style="width: 100%; justify-content: center; padding: 0.85rem; font-weight: 700; margin-bottom: 0.75rem;">
+                        الدخول للاستعلام عن المرتب &larr;
+                    </a>
+                    <div style="text-align: center; font-size: 0.85rem;">
+                        <a asp-controller="Account" asp-action="RegisterEmployee" style="color: #38bdf8; text-decoration: underline;">
+                            ليس لديك حساب؟ سجل الآن برقمك القومي ورقم الملف &larr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- كارت بوابة الإدارة والماليات -->
+            <div class="area-card admin-card" id="card-admin-portal" style="border-color: rgba(109, 40, 217, 0.35);">
+                <div>
+                    <div class="area-card-header">
+                        <div class="card-icon admin-icon" style="background: rgba(109, 40, 217, 0.15); color: #c084fc; font-size: 2rem;">
+                            🛡️
+                        </div>
+                        <div>
+                            <h2 class="card-title" style="font-size: 1.4rem;">الشؤون المالية وإدارة الرواتب</h2>
+                            <span class="badge badge-primary" style="margin-top: 0.25rem;">المسؤولين ومسؤولي الرواتب</span>
+                        </div>
+                    </div>
+
+                    <p class="card-desc" style="font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                        منظومة مركزية للشؤون المالية لرفع وتدقيق مسيرات المرتبات والحوافز الشهرية وإعداد كشوف الصرف المعتمدة لجميع الموظفين.
+                    </p>
+
+                    <ul class="card-features" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; list-style: none; padding: 0;">
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #c084fc;">📤</span>
+                            <span><strong>معالجة ملفات Excel:</strong> رفع مسيرات (.xlsx) وتفريغ آلاف السجلات في ثوانٍ.</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #38bdf8;">📊</span>
+                            <span><strong>تقارير وإجماليات دقيقة:</strong> إجمالي الاستحقاقات، الاستقطاعات، وصافي الصرف العام.</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #f87171;">🗑️</span>
+                            <span><strong>إدارة وحذف الصرفيات:</strong> حذف وإعادة رفع أي شهر بسهولة وسرعة فائقة.</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.92rem; color: #e2e8f0;">
+                            <span style="color: #34d399;">🛡️</span>
+                            <span><strong>منع الازدواجية:</strong> حماية صارمة لمنع تكرار مسير المرتب لنفس الموظف في الشهر.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-admin" style="width: 100%; justify-content: center; padding: 0.85rem; font-weight: 700; margin-bottom: 0.75rem;">
+                        الدخول إلى لوحة الإدارة المالية &larr;
+                    </a>
+                    <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+                        الدخول مقصور على مسؤولي الشؤون المالية والحسابات
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- خطوات الاستعلام السريع للموظف (How It Works) -->
+    <div class="panel-card" style="padding: 2.5rem; margin-top: 1rem; border-color: rgba(255, 255, 255, 0.08); background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(12px);">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <span class="badge badge-primary" style="margin-bottom: 0.5rem;">دليل الاستخدام السريع</span>
+            <h2 style="font-size: 1.6rem; font-weight: 800;">
+                كيفية الاستعلام عن مفردات مرتبك في 3 خطوات بسيطة
+            </h2>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 0.5rem auto 0 auto; font-size: 0.95rem;">
+                خطوات سهلة ومؤمنة للوصول إلى بيان راتبك وحوافزك الشهرية في أي وقت ومن أي جهاز.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.75rem;">
+            <!-- الخطوة 1 -->
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.75rem; position: relative;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--employee-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; margin-bottom: 1.25rem; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);">
+                    1
+                </div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.6rem;">تسجيل وتفعيل الحساب</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7;">
+                    إذا كنت موظفاً جديداً، أدخل <strong>الرقم القومي (14 رقم)</strong> و<strong>رقم الملف / الصرف</strong> لربط حسابك فوراً بكشوف المرتبات المعتمدة.
+                </p>
+            </div>
+
+            <!-- الخطوة 2 -->
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.75rem; position: relative;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-glow);">
+                    2
+                </div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.6rem;">اختيار الشهر ونوع الصرفية</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7;">
+                    بعد تسجيل الدخول، اختر الشهر والسنة المطلوبة ونوع الملف (مسير المرتبات الشهرية أو مسير الحوافز والمكافآت).
+                </p>
+            </div>
+
+            <!-- الخطوة 3 -->
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.75rem; position: relative;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; margin-bottom: 1.25rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);">
+                    3
+                </div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.6rem;">استعراض وطباعة البيان</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7;">
+                    اطلع على مفردات راتبك بالتفصيل مع بيان صافي المبلغ المحول للبنك، واضغط على زر الطباعة للحصول على نسخة معتمدة.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقات الموثوقية والأمان (Trust & Security Features) -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="font-size: 2.2rem;">🔒</div>
+            <div>
+                <strong style="display: block; font-size: 1rem; margin-bottom: 0.25rem;">سرية وخصوصية تامة</strong>
+                <span style="color: var(--text-secondary); font-size: 0.85rem;">بيانات الأجور مشفرة ومحمية ولا تتاح إلا لصاحب الحساب بعد التحقق.</span>
+            </div>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="font-size: 2.2rem;">⚡</div>
+            <div>
+                <strong style="display: block; font-size: 1rem; margin-bottom: 0.25rem;">تحديث لحظي للكشوف</strong>
+                <span style="color: var(--text-secondary); font-size: 0.85rem;">تتاح البيانات للاستعلام فور اعتمادها ورفعها مباشرة من الشؤون المالية.</span>
+            </div>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="font-size: 2.2rem;">📱</div>
+            <div>
+                <strong style="display: block; font-size: 1rem; margin-bottom: 0.25rem;">متوافق مع الهواتف الذكية</strong>
+                <span style="color: var(--text-secondary); font-size: 0.85rem;">استعلام سلس ومريح من هاتفك المحمول أو جهازك اللوحي في أي وقت.</span>
+            </div>
+        </div>
+    </div>
+</div>

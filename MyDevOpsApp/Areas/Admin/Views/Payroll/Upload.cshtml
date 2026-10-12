@@ -1,0 +1,268 @@
+@model MyDevOpsApp.Areas.Admin.Models.PayrollUploadViewModel
+@{
+    ViewData["Title"] = "رفع ملف المرتبات أو الحوافز";
+}
+
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+        📤 رفع ملف المرتبات أو الحوافز الشهرية
+    </h1>
+    <p style="color: var(--text-secondary);">
+        اختر الشهر والسنة ونوع الملف (.xlsx) لمعالجة كشوف الموظفين وتفريغ البيانات فوراً مع منع تكرار الصرفيات لنفس الموظف.
+    </p>
+</div>
+
+<div style="max-width: 780px;">
+    <!-- كارت الرفع الرئيسي -->
+    <div class="panel-card" style="padding: 2.25rem; position: relative;">
+        <!-- رسائل الخطأ الثابتة -->
+        <div id="error-alert-box" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; color: #fca5a5;">
+            <div id="error-message-text"></div>
+        </div>
+
+        <form asp-action="Upload" method="post" enctype="multipart/form-data" id="upload-payroll-form">
+            @Html.AntiForgeryToken()
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                <!-- اختيار السنة -->
+                <div>
+                    <label asp-for="Year" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        📅 السنة المالية:
+                    </label>
+                    <select asp-for="Year" id="select-year" class="form-control form-select" style="width: 100%;">
+                        @for (int y = DateTime.Now.Year + 1; y >= 2023; y--)
+                        {
+                            <option value="@y" selected="@(y == Model.Year)">@y</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- اختيار الشهر -->
+                <div>
+                    <label asp-for="Month" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        🗓️ شهر الصرفية:
+                    </label>
+                    <select asp-for="Month" id="select-month" class="form-control form-select" style="width: 100%;">
+                        <option value="1">1 - يناير</option>
+                        <option value="2">2 - فبراير</option>
+                        <option value="3">3 - مارس</option>
+                        <option value="4">4 - أبريل</option>
+                        <option value="5">5 - مايو</option>
+                        <option value="6">6 - يونيو</option>
+                        <option value="7">7 - يوليو</option>
+                        <option value="8">8 - أغسطس</option>
+                        <option value="9" selected>9 - سبتمبر</option>
+                        <option value="10">10 - أكتوبر</option>
+                        <option value="11">11 - نوفمبر</option>
+                        <option value="12">12 - ديسمبر</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- اختيار نوع الملف (مرتبات / حوافز) -->
+            <div style="margin-bottom: 1.75rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.6rem; font-size: 0.95rem;">
+                    💼 نوع ملف الصرف:
+                </label>
+                <div style="display: flex; gap: 2rem; background: rgba(255, 255, 255, 0.02); padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" asp-for="PayrollType" value="مرتبات" style="accent-color: var(--primary);" checked />
+                        <span style="font-weight: 600;">💵 مسير المرتبات الشهرية</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" asp-for="PayrollType" value="حوافز" style="accent-color: var(--primary);" />
+                        <span style="font-weight: 600;">🎁 مسير الحوافز والمكافآت</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- رفع ملف الإكسيل -->
+            <div style="margin-bottom: 2rem;">
+                <label asp-for="ExcelFile" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                    📁 اختيار ملف Excel (.xlsx):
+                </label>
+                <div id="drop-zone" style="border: 2px dashed rgba(99, 102, 241, 0.4); border-radius: var(--radius-md); padding: 2.25rem 1.5rem; text-align: center; background: rgba(99, 102, 241, 0.03); transition: all 0.3s ease;">
+                    <input asp-for="ExcelFile" type="file" accept=".xlsx" id="file-input" style="display: none;" onchange="updateFileLabel(this)" />
+                    <label for="file-input" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 2.8rem;">📊</span>
+                        <span id="file-label" style="font-weight: 700; color: #a5b4fc; font-size: 1.05rem;">
+                            انقر هنا لاختيار ملف الإكسيل (.xlsx)
+                        </span>
+                        <span id="file-subtext" style="font-size: 0.85rem; color: var(--text-muted);">
+                            يدعم قراءة بنود الاستحقاقات، الاستقطاعات، الصافي، وبيانات الموظف ورقم الملف والرقم القومي
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" id="btn-upload-submit" class="btn btn-admin" style="width: 100%; padding: 1rem; font-size: 1.15rem; font-weight: 700; justify-content: center; box-shadow: var(--shadow-glow);">
+                <span id="btn-icon">🚀</span> <span id="btn-text">بدء المعالجة وحفظ البيانات في الجداول</span>
+            </button>
+        </form>
+
+        <!-- نافذة مؤشر التقدم الحي (Live Progress Modal Overlay) -->
+        <div id="progress-modal" style="display: none; position: absolute; inset: 0; background: rgba(11, 15, 25, 0.94); backdrop-filter: blur(8px); border-radius: var(--radius-lg); z-index: 50; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
+            <div style="width: 100%; max-width: 480px;">
+                <!-- أيقونة الدوران والنبض -->
+                <div style="font-size: 3.5rem; margin-bottom: 1.25rem; animation: pulse 1.5s infinite ease-in-out;">
+                    ⚙️
+                </div>
+
+                <h3 id="progress-title" style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">
+                    جاري معالجة وتفريغ الملف...
+                </h3>
+
+                <!-- مؤشر المرحلة اللحظي -->
+                <p id="progress-status-text" style="color: #38bdf8; font-size: 0.95rem; font-weight: 600; margin-bottom: 1.25rem; min-height: 24px;">
+                    جاري رفع الملف إلى السيرفر...
+                </p>
+
+                <!-- شريط التقدم التفاعلي -->
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 9999px; height: 14px; overflow: hidden; margin-bottom: 1rem; position: relative;">
+                    <div id="progress-bar-fill" style="width: 15%; height: 100%; background: linear-gradient(90deg, #6366f1, #38bdf8, #10b981); border-radius: 9999px; transition: width 0.4s ease;"></div>
+                </div>
+
+                <!-- عداد النسبة والوقت -->
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                    <span id="progress-percent-label">15%</span>
+                    <span id="progress-timer-label">⏱️ الوقت المنقضي: 00:01 ث</span>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--text-secondary); text-align: right;">
+                    🛡️ <strong>فحص ذكي للتكرار:</strong> يضمن النظام عدم تكرار أي موظف في نفس الشهر واستبدال أي نسخة سابقة لنفس الصرفية تلقائياً.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة التعليمات وقواعد منع التكرار -->
+    <div class="panel-card" style="margin-top: 1.5rem; background: rgba(255, 255, 255, 0.02);">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.5rem;">🛡️ القواعد الذكية لمعالجة الملفات:</h4>
+        <ul style="color: var(--text-secondary); font-size: 0.88rem; padding-right: 1.25rem; line-height: 1.8;">
+            <li><strong>منع التكرار التام:</strong> لا يمكن للموظف الحصول على أكثر من مرتب أو حافز لنفس الشهر؛ يتم تجاوز أي تكرار لنفس الموظف داخل الملف.</li>
+            <li><strong>إعادة الرفع الآمنة:</strong> في حال إعادة رفع ملف لنفس الشهر والنوع، يستبدل النظام الدفعة السابقة بالكامل بنظافة تامة.</li>
+            <li><strong>إمكانية المسح:</strong> يمكنك في أي وقت حذف بيانات أي شهر من شاشة التقرير إذا اكتشفت مشكلة في الشيت لإعادة رفعه مجدداً.</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+        50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function updateFileLabel(input) {
+            const label = document.getElementById('file-label');
+            const subtext = document.getElementById('file-subtext');
+            const dropZone = document.getElementById('drop-zone');
+
+            if (input.files && input.files.length > 0) {
+                const file = input.files[0];
+                const sizeKb = (file.size / 1024).toFixed(1);
+                label.innerHTML = `✓ تم اختيار: <strong style="color: #fff;">${file.name}</strong> (${sizeKb} KB)`;
+                label.style.color = 'var(--success)';
+                subtext.innerText = 'الملف جاهز للمعالجة. اضغط على الزر بالأسفل للبدء.';
+                dropZone.style.borderColor = 'var(--success)';
+                dropZone.style.background = 'rgba(16, 185, 129, 0.05)';
+            } else {
+                label.innerText = 'انقر هنا لاختيار ملف الإكسيل (.xlsx)';
+                label.style.color = '#a5b4fc';
+                dropZone.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+                dropZone.style.background = 'rgba(99, 102, 241, 0.03)';
+            }
+        }
+
+        // معالجة الرفع عبر AJAX مع شريط تقدم ومؤشر زمني حي
+        document.getElementById('upload-payroll-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('file-input');
+            const errorBox = document.getElementById('error-alert-box');
+            const errorMsg = document.getElementById('error-message-text');
+
+            errorBox.style.display = 'none';
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                errorBox.style.display = 'block';
+                errorMsg.innerText = 'يرجى اختيار ملف الإكسيل (.xlsx) أولاً.';
+                return;
+            }
+
+            const modal = document.getElementById('progress-modal');
+            const fill = document.getElementById('progress-bar-fill');
+            const statusText = document.getElementById('progress-status-text');
+            const percentLabel = document.getElementById('progress-percent-label');
+            const timerLabel = document.getElementById('progress-timer-label');
+            const title = document.getElementById('progress-title');
+
+            modal.style.display = 'flex';
+
+            let seconds = 0;
+            const timerInterval = setInterval(() => {
+                seconds++;
+                const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+                const secs = String(seconds % 60).padStart(2, '0');
+                timerLabel.innerText = `⏱️ الوقت المنقضي: ${mins}:${secs} ث`;
+            }, 1000);
+
+            // تسلسل مراحل محاكاة التقدم
+            fill.style.width = '25%';
+            percentLabel.innerText = '25%';
+            statusText.innerText = 'جاري رفع الملف إلى السيرفر وقراءة أوراق العمل (EPPlus)...';
+
+            const stage2Timeout = setTimeout(() => {
+                fill.style.width = '55%';
+                percentLabel.innerText = '55%';
+                statusText.innerText = 'جاري تفريغ بيانات الموظفين وفحص ومنع تكرار الصرفيات...';
+            }, 1500);
+
+            const stage3Timeout = setTimeout(() => {
+                fill.style.width = '85%';
+                percentLabel.innerText = '85%';
+                statusText.innerText = 'جاري تسجيل بنود الاستحقاقات والاستقطاعات وحفظها في قاعدة البيانات...';
+            }, 3000);
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('@Url.Action("UploadAjax", "Payroll", new { area = "Admin" })', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                clearInterval(timerInterval);
+                clearTimeout(stage2Timeout);
+                clearTimeout(stage3Timeout);
+
+                const data = await response.json();
+
+                if (data.success) {
+                    fill.style.width = '100%';
+                    percentLabel.innerText = '100%';
+                    fill.style.background = 'var(--success)';
+                    title.innerText = '✅ اكتملت المعالجة بنجاح!';
+                    statusText.innerText = `تم استيراد ${data.count} موظف بنجاح بإجمالي صافي ${data.totalNet} ج.م! جاري نقلك لتقرير الشهر...`;
+
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl;
+                    }, 1200);
+                } else {
+                    modal.style.display = 'none';
+                    errorBox.style.display = 'block';
+                    errorMsg.innerText = data.message || 'حدث خطأ غير متوقع أثناء معالجة الملف.';
+                }
+            } catch (err) {
+                clearInterval(timerInterval);
+                clearTimeout(stage2Timeout);
+                clearTimeout(stage3Timeout);
+                modal.style.display = 'none';
+                errorBox.style.display = 'block';
+                errorMsg.innerText = 'تعذر الاتصال بالسيرفر أثناء رفع الملف: ' + err.message;
+            }
+        });
+    </script>
+}

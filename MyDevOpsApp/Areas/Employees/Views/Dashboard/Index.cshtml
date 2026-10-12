@@ -1,0 +1,242 @@
+@model MyDevOpsApp.Areas.Employees.Models.EmployeePaySlipViewModel
+@{
+    ViewData["Title"] = "بوابة الموظف - كشف المرتبات والحوافز";
+    var earnings = Model.CurrentRecord?.Items.Where(i => i.ItemType == "Earning").ToList() ?? new();
+    var deductions = Model.CurrentRecord?.Items.Where(i => i.ItemType == "Deduction").ToList() ?? new();
+}
+
+@if (TempData["WelcomeMessage"] != null)
+{
+    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #6ee7b7; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.3rem;">🎉</span>
+        <div>@TempData["WelcomeMessage"]</div>
+    </div>
+}
+
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.35rem;">
+        💼 بيان مفردات المرتبات والحوافز الشهرية
+    </h1>
+    <p style="color: var(--text-secondary);">
+        مرحباً بك، يمكنك اختيار الشهر والسنة ونوع الصرف للاطلاع على تفاصيل مفردات راتبك وحوافزك وطباعة البيان الرسمي.
+    </p>
+</div>
+
+<!-- شريط فلترة الشهر والسنة والنوع -->
+<div class="panel-card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem;">
+    <form method="get" asp-action="Index" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">السنة:</label>
+            <select name="year" class="form-control" style="padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;">
+                @for (int y = DateTime.Now.Year + 1; y >= 2023; y--)
+                {
+                    <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">الشهر:</label>
+            <select name="month" class="form-control" style="padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;">
+                @for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m" selected="@(m == Model.SelectedMonth)">@m</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">نوع الصرف:</label>
+            <select name="type" class="form-control" style="padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;">
+                <option value="مرتبات" selected="@(Model.SelectedPayrollType == "مرتبات")">مرتبات</option>
+                <option value="حوافز" selected="@(Model.SelectedPayrollType == "حوافز")">حوافز</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-employee" style="padding: 0.55rem 1.25rem;">
+                🔍 عرض المفردات
+            </button>
+        </div>
+
+        @if (Model.CurrentRecord != null)
+        {
+            <div style="margin-right: auto;">
+                <button type="button" onclick="window.print()" class="btn" style="background: rgba(255, 255, 255, 0.08); color: #fff; padding: 0.55rem 1rem;">
+                    🖨️ طباعة قسيمة الصرف
+                </button>
+            </div>
+        }
+    </form>
+</div>
+
+@if (Model.EmployeeInfo == null)
+{
+    <div class="panel-card" style="text-align: center; padding: 4rem 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+        <h3 style="font-size: 1.4rem; margin-bottom: 0.75rem;">لم يتم ربط حسابك بملف موظف حتى الآن</h3>
+        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto;">
+            يرجى التأكد من قيام إدارة المرتبات برفع مسير الرواتب أو تسجيل حسابك بالرقم القومي ورقم الملف الصحيحين.
+        </p>
+    </div>
+}
+else if (Model.CurrentRecord == null)
+{
+    <div class="panel-card" style="text-align: center; padding: 3.5rem 2rem;">
+        <div style="font-size: 2.8rem; margin-bottom: 1rem;">📅</div>
+        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem;">
+            لا توجد بيانات صرفية (@Model.SelectedPayrollType) مسجلة لشهر @Model.SelectedMonth / @Model.SelectedYear
+        </h3>
+        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 1.5rem auto;">
+            لم تقم إدارة المرتبات برفع هذا المسير بعد أو أنه لم يصرف لهذا الشهر.
+        </p>
+
+        @if (Model.AvailableBatches.Any())
+        {
+            <div style="margin-top: 1.5rem; text-align: right; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">الأشهر المتوفرة لك بالفعل:</h4>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    @foreach (var b in Model.AvailableBatches)
+                    {
+                        <a asp-action="Index" asp-route-year="@b.Year" asp-route-month="@b.Month" asp-route-type="@b.PayrollType"
+                           class="btn" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(2, 132, 199, 0.3); color: #38bdf8;">
+                            شهر @b.Month / @b.Year (@b.PayrollType - صافي: @b.NetAmount.ToString("N0") ج.م)
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <!-- بطاقة بيانات الموظف -->
+    <div class="panel-card" style="margin-bottom: 1.5rem; background: rgba(2, 132, 199, 0.03); border-color: rgba(2, 132, 199, 0.25);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; font-size: 0.9rem;">
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">اسم الموظف:</span>
+                <strong style="font-size: 1.05rem;">@Model.CurrentRecord.EmployeeName</strong>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">رقم الملف / الصرف:</span>
+                <strong style="color: #38bdf8;">#@Model.CurrentRecord.PaymentNumber</strong>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">الرقم القومي:</span>
+                <strong style="font-family: monospace;">@Model.CurrentRecord.NationalId</strong>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">الإدارة:</span>
+                <strong>@Model.CurrentRecord.Department</strong>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">الدرجة:</span>
+                <span class="badge badge-info">@Model.CurrentRecord.Grade</span>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">البنك والفرع:</span>
+                <strong>@Model.CurrentRecord.BankName (@Model.CurrentRecord.Branch)</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقات الإجماليات الثلاثة -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                📈
+            </div>
+            <div class="metric-info">
+                <h4>إجمالي الاستحقاقات</h4>
+                <div class="metric-value" style="color: var(--success);">@Model.CurrentRecord.TotalEarnings.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                📉
+            </div>
+            <div class="metric-info">
+                <h4>إجمالي الاستقطاعات</h4>
+                <div class="metric-value" style="color: var(--danger);">@Model.CurrentRecord.TotalDeductions.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8;">
+                💵
+            </div>
+            <div class="metric-info">
+                <h4>صافي المستحق للصرف</h4>
+                <div class="metric-value" style="color: #38bdf8;">@Model.CurrentRecord.NetAmount.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جداول بنود الاستحقاقات والاستقطاعات بالتفصيل -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- الاستحقاقات -->
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header" style="border-bottom-color: rgba(16, 185, 129, 0.3);">
+                <h2 class="panel-title" style="color: var(--success);">
+                    📈 بنود الاستحقاقات (@earnings.Count بند)
+                </h2>
+                <span class="badge badge-success">@Model.CurrentRecord.TotalEarnings.ToString("N2") ج.م</span>
+            </div>
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>كود</th>
+                        <th>البيان</th>
+                        <th>القيمة</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in earnings)
+                    {
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: 0.85rem;">@item.Code</td>
+                            <td style="font-weight: 500;">@item.Name</td>
+                            <td style="color: var(--text-secondary);">@(item.Value.HasValue ? item.Value.Value.ToString("N2") : "-")</td>
+                            <td style="font-weight: 600; color: var(--success);">@(item.Total.HasValue ? item.Total.Value.ToString("N2") : "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- الاستقطاعات -->
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header" style="border-bottom-color: rgba(239, 68, 68, 0.3);">
+                <h2 class="panel-title" style="color: var(--danger);">
+                    📉 بنود الاستقطاعات (@deductions.Count بند)
+                </h2>
+                <span class="badge badge-danger" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                    @Model.CurrentRecord.TotalDeductions.ToString("N2") ج.م
+                </span>
+            </div>
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>كود</th>
+                        <th>البيان</th>
+                        <th>القيمة</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in deductions)
+                    {
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: 0.85rem;">@item.Code</td>
+                            <td style="font-weight: 500;">@item.Name</td>
+                            <td style="color: var(--text-secondary);">@(item.Value.HasValue ? item.Value.Value.ToString("N2") : "-")</td>
+                            <td style="font-weight: 600; color: var(--danger);">@(item.Total.HasValue ? item.Total.Value.ToString("N2") : "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

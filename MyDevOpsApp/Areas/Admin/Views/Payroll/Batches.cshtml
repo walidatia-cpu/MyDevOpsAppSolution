@@ -1,0 +1,120 @@
+@model IEnumerable<MyDevOpsApp.Data.Entities.PayrollBatch>
+@{
+    ViewData["Title"] = "سجل الملفات المرفوعة";
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.35rem;">
+            📁 سجل ملفات الصرفيات المرفوعة
+        </h1>
+        <p style="color: var(--text-secondary);">
+            قائمة بجميع دفعات المرتبات والحوافز التي تم رفعها وتفريغها في النظام.
+        </p>
+    </div>
+    <div>
+        <a asp-action="Upload" class="btn btn-admin">
+            📤 رفع ملف جديد &larr;
+        </a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="panel-header">
+        <h2 class="panel-title">قائمة الدفعات المسجلة</h2>
+        <span class="badge badge-info">إجمالي: @Model.Count() دفعة</span>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            لم يتم رفع أي ملفات صرفيات حتى الآن.
+            <div style="margin-top: 1rem;">
+                <a asp-action="Upload" class="btn btn-admin">رفع أول ملف الآن</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div style="overflow-x: auto;">
+            <table class="custom-table" id="table-payroll-batches">
+                <thead>
+                    <tr>
+                        <th>المعرف (#)</th>
+                        <th>الشهر / السنة</th>
+                        <th>نوع الصرف</th>
+                        <th>اسم الملف الأصلي</th>
+                        <th>عدد الموظفين</th>
+                        <th>إجمالي الاستحقاقات</th>
+                        <th>إجمالي الصافي</th>
+                        <th>تاريخ الرفع</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var batch in Model)
+                    {
+                        <tr>
+                            <td style="color: var(--text-muted); font-weight: 700;">#@batch.Id</td>
+                            <td style="font-weight: 700;">@batch.Month / @batch.Year</td>
+                            <td>
+                                <span class="badge @(batch.PayrollType == "مرتبات" ? "badge-primary" : "badge-warning")">
+                                    @batch.PayrollType
+                                </span>
+                            </td>
+                            <td style="font-size: 0.85rem; color: var(--text-secondary);">@batch.OriginalFileName</td>
+                            <td style="font-weight: 600;">@batch.TotalEmployeesCount</td>
+                            <td style="color: var(--success); font-weight: 600;">@batch.TotalEarningsSum.ToString("N2")</td>
+                            <td style="color: #38bdf8; font-weight: 700;">@batch.TotalNetSum.ToString("N2")</td>
+                            <td style="color: var(--text-muted); font-size: 0.85rem;">@batch.UploadedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td style="display: flex; gap: 0.5rem; align-items: center;">
+                                <a asp-action="Report" asp-route-year="@batch.Year" asp-route-month="@batch.Month" asp-route-type="@batch.PayrollType"
+                                   class="btn" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); color: #c7d2fe;">
+                                    عرض التقرير 📊
+                                </a>
+                                <form asp-action="DeleteBatch" asp-route-id="@batch.Id" method="post" onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذه الدفعة وجميع سجلاتها؟');" style="display: inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                                        حذف 🗑️
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if ($('#table-payroll-batches').length) {
+                $('#table-payroll-batches').DataTable({
+                    language: {
+                        search: "🔍 بحث في سجل الملفات:",
+                        searchPlaceholder: "اسم الملف، نوع الصرف، التاريخ...",
+                        lengthMenu: "عرض _MENU_ دفعة لكل صفحة",
+                        info: "عرض _START_ إلى _END_ من أصل _TOTAL_ دفعة",
+                        infoEmpty: "لا توجد دفعات مسجلة",
+                        infoFiltered: "(تمت التصفية من أصل _MAX_ دفعة)",
+                        zeroRecords: "لم يتم العثور على أية دفعات مطابقة",
+                        paginate: {
+                            first: "الأول",
+                            previous: "السابق",
+                            next: "التالي",
+                            last: "الأخير"
+                        }
+                    },
+                    pageLength: 10,
+                    responsive: true,
+                    order: [[0, "desc"]],
+                    columnDefs: [
+                        { orderable: false, targets: [8] }
+                    ]
+                });
+            }
+        });
+    </script>
+}

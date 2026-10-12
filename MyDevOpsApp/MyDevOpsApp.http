@@ -1,6 +1,13 @@
 @MyDevOpsApp_HostAddress = http://localhost:5164
 
-GET {{MyDevOpsApp_HostAddress}}/weatherforecast/
-Accept: application/json
+### 1. Home Portal
+GET {{MyDevOpsApp_HostAddress}}/
+Accept: text/html
 
-###
+### 2. Admin Area
+GET {{MyDevOpsApp_HostAddress}}/Admin
+Accept: text/html
+
+### 3. Employees Area
+GET {{MyDevOpsApp_HostAddress}}/Employees
+Accept: text/html
