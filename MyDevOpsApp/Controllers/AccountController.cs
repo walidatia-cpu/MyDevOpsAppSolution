@@ -96,6 +96,8 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
+            user.LastLoginAt = DateTime.Now;
+            await _userManager.UpdateAsync(user);
             _logger.LogInformation("تم تسجيل دخول المستخدم {UserName} بنجاح.", user.UserName);
             return await RedirectToUserArea(user, returnUrl);
         }
@@ -151,6 +153,8 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
+            user.LastLoginAt = DateTime.Now;
+            await _userManager.UpdateAsync(user);
             _logger.LogInformation("تم التحقق بنجاح بالمصادقة الثنائية للمستخدم {UserName}.", user.UserName);
             return await RedirectToUserArea(user, model.ReturnUrl);
         }
@@ -200,6 +204,8 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
+            user.LastLoginAt = DateTime.Now;
+            await _userManager.UpdateAsync(user);
             _logger.LogInformation("تم تسجيل دخول المستخدم {UserName} باستخدام كود الاسترداد.", user.UserName);
             return await RedirectToUserArea(user, model.ReturnUrl);
         }
@@ -405,6 +411,8 @@ public class AccountController : Controller
             NationalId = employee.NationalId,
             PaymentNumber = employee.PaymentNumber,
             EmployeeId = employee.Id,
+            CreatedAt = DateTime.Now,
+            LastLoginAt = DateTime.Now,
             EmailConfirmed = true
         };
 

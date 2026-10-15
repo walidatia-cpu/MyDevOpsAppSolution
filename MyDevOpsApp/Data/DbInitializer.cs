@@ -41,6 +41,25 @@ public static class DbInitializer
             await context.Database.EnsureCreatedAsync();
         }
 
+        // التأكد من توفر حقلي CreatedAt و LastLoginAt في جدول AspNetUsers
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync("ALTER TABLE AspNetUsers ADD COLUMN CreatedAt TEXT NULL;");
+        }
+        catch { /* العمود موجود مسبقاً */ }
+
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync("ALTER TABLE AspNetUsers ADD COLUMN LastLoginAt TEXT NULL;");
+        }
+        catch { /* العمود موجود مسبقاً */ }
+
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync("UPDATE AspNetUsers SET CreatedAt = datetime('now') WHERE CreatedAt IS NULL;");
+        }
+        catch { }
+
         // 1. إنشاء الأدوار (Roles)
         string[] roles = { "Admin", "Employee" };
         foreach (var role in roles)
@@ -62,6 +81,8 @@ public static class DbInitializer
                 Email = defaultAdminEmail,
                 FullName = "مدير النظام (System Admin)",
                 Department = "إدارة التكنولوجيا والبنية التحتية",
+                CreatedAt = DateTime.Now.AddDays(-30),
+                LastLoginAt = DateTime.Now,
                 EmailConfirmed = true
             };
 
@@ -105,6 +126,8 @@ public static class DbInitializer
                 NationalId = sampleNationalId,
                 PaymentNumber = samplePaymentNumber,
                 EmployeeId = sampleEmployee.Id,
+                CreatedAt = DateTime.Now.AddDays(-15),
+                LastLoginAt = DateTime.Now.AddHours(-2),
                 EmailConfirmed = true
             };
 

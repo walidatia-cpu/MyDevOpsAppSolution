@@ -11,4 +11,8 @@ public class ApplicationUser : IdentityUser
     public string? NationalId { get; set; }
     public string? PaymentNumber { get; set; }
     public int? EmployeeId { get; set; }
+
+    // تواريخ التسجيل وآخر تسجيل دخول
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime? LastLoginAt { get; set; }
 }
