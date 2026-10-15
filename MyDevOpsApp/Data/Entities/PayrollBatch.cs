@@ -14,7 +14,7 @@ public class PayrollBatch
     [MaxLength(50)]
     public string PayrollType { get; set; } = "مرتبات"; // "مرتبات" أو "حوافز"
 
-    [MaxLength(255)]
+    [MaxLength(500)]
     public string OriginalFileName { get; set; } = string.Empty;
 
     public DateTime UploadedAt { get; set; } = DateTime.Now;

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyDevOpsApp.Areas.Admin.Models;
 using MyDevOpsApp.Data;
+using MyDevOpsApp.Data.Entities;
 using MyDevOpsApp.Services;
 
 namespace MyDevOpsApp.Areas.Admin.Controllers;
@@ -27,13 +28,13 @@ public class PayrollController : Controller
 
     // 1. شاشة رفع ملفات المرتبات والحوافز
     [HttpGet]
-    public IActionResult Upload()
+    public IActionResult Upload(string? type)
     {
         var model = new PayrollUploadViewModel
         {
             Year = DateTime.Now.Year,
             Month = DateTime.Now.Month,
-            PayrollType = "مرتبات"
+            PayrollType = !string.IsNullOrEmpty(type) ? type : "حوافز"
         };
         return View(model);
     }
@@ -42,37 +43,61 @@ public class PayrollController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Upload(PayrollUploadViewModel model)
     {
-        if (model.ExcelFile == null || model.ExcelFile.Length == 0)
+        var filesToProcess = (model.ExcelFiles ?? new List<IFormFile>())
+            .Where(f => f != null && f.Length > 0)
+            .ToList();
+
+        if (!filesToProcess.Any() && model.ExcelFile != null && model.ExcelFile.Length > 0)
         {
-            ModelState.AddModelError("ExcelFile", "يرجى اختيار ملف الإكسيل بصيغة .xlsx");
+            filesToProcess.Add(model.ExcelFile);
+        }
+
+        if (!filesToProcess.Any())
+        {
+            ModelState.AddModelError("ExcelFiles", "يرجى اختيار ملف إكسيل واحد على الأقل بصيغة .xlsx");
             return View(model);
         }
 
-        var extension = Path.GetExtension(model.ExcelFile.FileName).ToLowerInvariant();
-        if (extension != ".xlsx")
+        foreach (var file in filesToProcess)
         {
-            ModelState.AddModelError("ExcelFile", "الملف المسموح به هو ملفات Excel بصيغة .xlsx فقط.");
-            return View(model);
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
+            {
+                ModelState.AddModelError("ExcelFiles", $"الملف '{file.FileName}' غير مسموح به. الصيغة المسموح بها هي .xlsx فقط.");
+                return View(model);
+            }
         }
 
         try
         {
-            using var stream = model.ExcelFile.OpenReadStream();
-            var batch = await _parserService.ImportPayrollAsync(
-                stream,
-                model.ExcelFile.FileName,
-                model.Year,
-                model.Month,
-                model.PayrollType);
+            var fileStreams = filesToProcess.Select(f => (f.OpenReadStream(), f.FileName)).ToList();
+            PayrollBatch batch;
+            try
+            {
+                batch = await _parserService.ImportMultiplePayrollAsync(
+                    fileStreams,
+                    model.Year,
+                    model.Month,
+                    model.PayrollType,
+                    model.AppendToExisting);
+            }
+            finally
+            {
+                foreach (var (stream, _) in fileStreams)
+                {
+                    stream.Dispose();
+                }
+            }
 
-            TempData["SuccessMessage"] = $"تم بنجاح رفع واستيراد بيانات {model.PayrollType} لشهر {model.Month}/{model.Year} بعدد {batch.TotalEmployeesCount} موظف وإجمالي صافي: {batch.TotalNetSum:N2} ج.م";
+            string filesText = filesToProcess.Count == 1 ? "ملف واحد" : $"{filesToProcess.Count} ملفات";
+            TempData["SuccessMessage"] = $"تم بنجاح استيراد وقراءة {filesText} لـ {model.PayrollType} شهر {model.Month}/{model.Year} بعدد إجمالي {batch.TotalEmployeesCount} موظف وإجمالي صافي: {batch.TotalNetSum:N2} ج.م";
 
             return RedirectToAction(nameof(Report), new { year = model.Year, month = model.Month, type = model.PayrollType });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "حدث خطأ أثناء معالجة ملف المرتبات.");
-            ModelState.AddModelError(string.Empty, "فشلت معالجة الملف: " + ex.Message);
+            _logger.LogError(ex, "حدث خطأ أثناء معالجة ملفات المرتبات/الحوافز.");
+            ModelState.AddModelError(string.Empty, "فشلت معالجة الملفات: " + ex.Message);
             return View(model);
         }
     }
@@ -82,34 +107,59 @@ public class PayrollController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UploadAjax([FromForm] PayrollUploadViewModel model)
     {
-        if (model.ExcelFile == null || model.ExcelFile.Length == 0)
+        var filesToProcess = (model.ExcelFiles ?? new List<IFormFile>())
+            .Where(f => f != null && f.Length > 0)
+            .ToList();
+
+        if (!filesToProcess.Any() && model.ExcelFile != null && model.ExcelFile.Length > 0)
         {
-            return Json(new { success = false, message = "يرجى اختيار ملف الإكسيل بصيغة .xlsx" });
+            filesToProcess.Add(model.ExcelFile);
         }
 
-        var extension = Path.GetExtension(model.ExcelFile.FileName).ToLowerInvariant();
-        if (extension != ".xlsx")
+        if (!filesToProcess.Any())
         {
-            return Json(new { success = false, message = "الملف المسموح به هو ملفات Excel بصيغة .xlsx فقط." });
+            return Json(new { success = false, message = "يرجى اختيار ملف إكسيل واحد على الأقل بصيغة .xlsx" });
+        }
+
+        foreach (var file in filesToProcess)
+        {
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
+            {
+                return Json(new { success = false, message = $"الملف '{file.FileName}' غير صالح. المسموح به فقط هو ملفات Excel بصيغة .xlsx" });
+            }
         }
 
         try
         {
-            using var stream = model.ExcelFile.OpenReadStream();
-            var batch = await _parserService.ImportPayrollAsync(
-                stream,
-                model.ExcelFile.FileName,
-                model.Year,
-                model.Month,
-                model.PayrollType);
+            var fileStreams = filesToProcess.Select(f => (f.OpenReadStream(), f.FileName)).ToList();
+            PayrollBatch batch;
+            try
+            {
+                batch = await _parserService.ImportMultiplePayrollAsync(
+                    fileStreams,
+                    model.Year,
+                    model.Month,
+                    model.PayrollType,
+                    model.AppendToExisting);
+            }
+            finally
+            {
+                foreach (var (stream, _) in fileStreams)
+                {
+                    stream.Dispose();
+                }
+            }
 
-            string successMsg = $"تم بنجاح استيراد بيانات {model.PayrollType} لشهر {model.Month}/{model.Year} بعدد {batch.TotalEmployeesCount} موظف وإجمالي صافي: {batch.TotalNetSum:N2} ج.م";
+            string filesText = filesToProcess.Count == 1 ? "ملف واحد" : $"{filesToProcess.Count} ملفات";
+            string successMsg = $"تم بنجاح قراءة وتفريغ {filesText} لـ {model.PayrollType} شهر {model.Month}/{model.Year} بعدد {batch.TotalEmployeesCount} موظف وإجمالي صافي: {batch.TotalNetSum:N2} ج.م";
             TempData["SuccessMessage"] = successMsg;
 
             return Json(new
             {
                 success = true,
                 message = successMsg,
+                filesCount = filesToProcess.Count,
                 count = batch.TotalEmployeesCount,
                 totalNet = batch.TotalNetSum.ToString("N2"),
                 redirectUrl = Url.Action(nameof(Report), new { year = model.Year, month = model.Month, type = model.PayrollType })
@@ -117,8 +167,8 @@ public class PayrollController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "حدث خطأ أثناء معالجة الملف عبر AJAX.");
-            return Json(new { success = false, message = "فشلت معالجة الملف: " + ex.Message });
+            _logger.LogError(ex, "حدث خطأ أثناء معالجة الملفات عبر AJAX.");
+            return Json(new { success = false, message = "فشلت معالجة الملفات: " + ex.Message });
         }
     }
 

@@ -3,21 +3,6 @@
     ViewData["Title"] = $"تقرير صرفيات {Model.SelectedPayrollType} - شهر {Model.SelectedMonth}/{Model.SelectedYear}";
 }
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #6ee7b7; display: flex; align-items: center; gap: 0.75rem;">
-        <span style="font-size: 1.3rem;">✅</span>
-        <div>@TempData["SuccessMessage"]</div>
-    </div>
-}
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #fca5a5; display: flex; align-items: center; gap: 0.75rem;">
-        <span style="font-size: 1.3rem;">⚠️</span>
-        <div>@TempData["ErrorMessage"]</div>
-    </div>
-}
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
@@ -152,7 +137,7 @@ else
                 📋 قائمة الموظفين وتفاصيل الصرفية (@Model.FilteredRecords.Count موظف)
             </h2>
             <div style="display: flex; gap: 0.75rem; align-items: center;">
-                <span class="badge badge-primary">الملف: @Model.CurrentBatch.OriginalFileName</span>
+                <span class="badge badge-primary" style="max-width: 550px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@Model.CurrentBatch.OriginalFileName">📁 @Model.CurrentBatch.OriginalFileName</span>
             </div>
         </div>
 

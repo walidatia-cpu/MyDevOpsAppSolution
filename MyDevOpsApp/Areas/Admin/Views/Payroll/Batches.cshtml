@@ -43,7 +43,7 @@
                         <th>المعرف (#)</th>
                         <th>الشهر / السنة</th>
                         <th>نوع الصرف</th>
-                        <th>اسم الملف الأصلي</th>
+                        <th>الملف / الملفات المرفوعة</th>
                         <th>عدد الموظفين</th>
                         <th>إجمالي الاستحقاقات</th>
                         <th>إجمالي الصافي</th>
@@ -62,7 +62,7 @@
                                     @batch.PayrollType
                                 </span>
                             </td>
-                            <td style="font-size: 0.85rem; color: var(--text-secondary);">@batch.OriginalFileName</td>
+                            <td style="font-size: 0.85rem; color: var(--text-secondary); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@batch.OriginalFileName">📁 @batch.OriginalFileName</td>
                             <td style="font-weight: 600;">@batch.TotalEmployeesCount</td>
                             <td style="color: var(--success); font-weight: 600;">@batch.TotalEarningsSum.ToString("N2")</td>
                             <td style="color: #38bdf8; font-weight: 700;">@batch.TotalNetSum.ToString("N2")</td>

@@ -1,28 +1,32 @@
 @model MyDevOpsApp.Areas.Admin.Models.PayrollUploadViewModel
 @{
-    ViewData["Title"] = "رفع ملف المرتبات أو الحوافز";
+    ViewData["Title"] = "رفع ملفات المرتبات أو الحوافز الشهرية";
 }
 
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
-        📤 رفع ملف المرتبات أو الحوافز الشهرية
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); padding: 0.35rem 0.85rem; border-radius: 9999px; color: #a5b4fc; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">
+        ⚡ معالجة متعددة الملفات (Multi-File Processing)
+    </div>
+    <h1 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 0.5rem;">
+        📤 رفع ملفات المرتبات والحوافز الشهرية
     </h1>
-    <p style="color: var(--text-secondary);">
-        اختر الشهر والسنة ونوع الملف (.xlsx) لمعالجة كشوف الموظفين وتفريغ البيانات فوراً مع منع تكرار الصرفيات لنفس الموظف.
+    <p style="color: var(--text-secondary); max-width: 820px; line-height: 1.7;">
+        اختر الشهر والسنة ونوع الصرف، ويمكنك <strong>اختيار ملف واحد أو عدة ملفات إكسيل (.xlsx) دفعة واحدة</strong> ليقوم النظام بقراءتها جميعاً، دمج بنود الموظفين، وربطها بالشهر المالي المحدد بدقة وسرعة فائقة.
     </p>
 </div>
 
-<div style="max-width: 780px;">
+<div style="max-width: 840px;">
     <!-- كارت الرفع الرئيسي -->
     <div class="panel-card" style="padding: 2.25rem; position: relative;">
-        <!-- رسائل الخطأ الثابتة -->
-        <div id="error-alert-box" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; color: #fca5a5;">
+        <!-- رسائل الخطأ -->
+        <div id="error-alert-box" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #fca5a5;">
             <div id="error-message-text"></div>
         </div>
 
         <form asp-action="Upload" method="post" enctype="multipart/form-data" id="upload-payroll-form">
             @Html.AntiForgeryToken()
 
+            <!-- اختيار السنة والشهر -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
                 <!-- اختيار السنة -->
                 <div>
@@ -40,81 +44,139 @@
                 <!-- اختيار الشهر -->
                 <div>
                     <label asp-for="Month" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
-                        🗓️ شهر الصرفية:
+                        🗓️ شهر الصرفية المستهدفة:
                     </label>
                     <select asp-for="Month" id="select-month" class="form-control form-select" style="width: 100%;">
-                        <option value="1">1 - يناير</option>
-                        <option value="2">2 - فبراير</option>
-                        <option value="3">3 - مارس</option>
-                        <option value="4">4 - أبريل</option>
-                        <option value="5">5 - مايو</option>
-                        <option value="6">6 - يونيو</option>
-                        <option value="7">7 - يوليو</option>
-                        <option value="8">8 - أغسطس</option>
-                        <option value="9" selected>9 - سبتمبر</option>
-                        <option value="10">10 - أكتوبر</option>
-                        <option value="11">11 - نوفمبر</option>
-                        <option value="12">12 - ديسمبر</option>
+                        <option value="1" selected="@(Model.Month == 1)">1 - يناير</option>
+                        <option value="2" selected="@(Model.Month == 2)">2 - فبراير</option>
+                        <option value="3" selected="@(Model.Month == 3)">3 - مارس</option>
+                        <option value="4" selected="@(Model.Month == 4)">4 - أبريل</option>
+                        <option value="5" selected="@(Model.Month == 5)">5 - مايو</option>
+                        <option value="6" selected="@(Model.Month == 6)">6 - يونيو</option>
+                        <option value="7" selected="@(Model.Month == 7)">7 - يوليو</option>
+                        <option value="8" selected="@(Model.Month == 8)">8 - أغسطس</option>
+                        <option value="9" selected="@(Model.Month == 9)">9 - سبتمبر</option>
+                        <option value="10" selected="@(Model.Month == 10)">10 - أكتوبر</option>
+                        <option value="11" selected="@(Model.Month == 11)">11 - نوفمبر</option>
+                        <option value="12" selected="@(Model.Month == 12)">12 - ديسمبر</option>
                     </select>
                 </div>
             </div>
 
             <!-- اختيار نوع الملف (مرتبات / حوافز) -->
-            <div style="margin-bottom: 1.75rem;">
+            <div style="margin-bottom: 1.5rem;">
                 <label style="display: block; font-weight: 600; margin-bottom: 0.6rem; font-size: 0.95rem;">
                     💼 نوع ملف الصرف:
                 </label>
-                <div style="display: flex; gap: 2rem; background: rgba(255, 255, 255, 0.02); padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <div style="display: flex; gap: 2rem; background: rgba(255, 255, 255, 0.02); padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); flex-wrap: wrap;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="radio" asp-for="PayrollType" value="مرتبات" style="accent-color: var(--primary);" checked />
+                        <input type="radio" asp-for="PayrollType" value="مرتبات" style="accent-color: var(--primary);" checked="@(Model.PayrollType == "مرتبات")" />
                         <span style="font-weight: 600;">💵 مسير المرتبات الشهرية</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="radio" asp-for="PayrollType" value="حوافز" style="accent-color: var(--primary);" />
-                        <span style="font-weight: 600;">🎁 مسير الحوافز والمكافآت</span>
+                        <input type="radio" asp-for="PayrollType" value="حوافز" style="accent-color: var(--primary);" checked="@(Model.PayrollType == "حوافز")" />
+                        <span style="font-weight: 600; color: #38bdf8;">🎁 مسير الحوافز والمكافآت (يدعم عدة ملفات)</span>
                     </label>
                 </div>
             </div>
 
-            <!-- رفع ملف الإكسيل -->
-            <div style="margin-bottom: 2rem;">
-                <label asp-for="ExcelFile" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
-                    📁 اختيار ملف Excel (.xlsx):
+            <!-- خيار طريقة الربط بالشهر الحالي -->
+            <div style="margin-bottom: 1.75rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.6rem; font-size: 0.95rem;">
+                    ⚙️ طريقة التعامل مع كشوف الشهر المحددة:
                 </label>
-                <div id="drop-zone" style="border: 2px dashed rgba(99, 102, 241, 0.4); border-radius: var(--radius-md); padding: 2.25rem 1.5rem; text-align: center; background: rgba(99, 102, 241, 0.03); transition: all 0.3s ease;">
-                    <input asp-for="ExcelFile" type="file" accept=".xlsx" id="file-input" style="display: none;" onchange="updateFileLabel(this)" />
-                    <label for="file-input" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 2.8rem;">📊</span>
-                        <span id="file-label" style="font-weight: 700; color: #a5b4fc; font-size: 1.05rem;">
-                            انقر هنا لاختيار ملف الإكسيل (.xlsx)
-                        </span>
-                        <span id="file-subtext" style="font-size: 0.85rem; color: var(--text-muted);">
-                            يدعم قراءة بنود الاستحقاقات، الاستقطاعات، الصافي، وبيانات الموظف ورقم الملف والرقم القومي
-                        </span>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: rgba(255, 255, 255, 0.02); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
+                        <input type="radio" asp-for="AppendToExisting" value="false" checked style="margin-top: 0.2rem; accent-color: var(--primary);" />
+                        <div>
+                            <strong style="display: block; font-size: 0.9rem; color: #fff;">استبدال شامل لكشوف الشهر</strong>
+                            <small style="color: var(--text-secondary); font-size: 0.8rem; display: block; margin-top: 0.2rem;">
+                                مسح أي كشوف سابقة لنفس الشهر والنوع وإعادة بنائها نظيفة من الملفات المختارة.
+                            </small>
+                        </div>
+                    </label>
+
+                    <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: rgba(255, 255, 255, 0.02); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
+                        <input type="radio" asp-for="AppendToExisting" value="true" style="margin-top: 0.2rem; accent-color: var(--primary);" />
+                        <div>
+                            <strong style="display: block; font-size: 0.9rem; color: #38bdf8;">دمج وإضافة على كشوف الشهر</strong>
+                            <small style="color: var(--text-secondary); font-size: 0.8rem; display: block; margin-top: 0.2rem;">
+                                الإبقاء على كشوف الشهر الحالية ودمج بيانات الموظفين والبنود الجديدة إليها تلقائياً.
+                            </small>
+                        </div>
                     </label>
                 </div>
             </div>
 
-            <button type="submit" id="btn-upload-submit" class="btn btn-admin" style="width: 100%; padding: 1rem; font-size: 1.15rem; font-weight: 700; justify-content: center; box-shadow: var(--shadow-glow);">
+            <!-- منطقة رفع الملفات المتعددة (Drag & Drop Zone) -->
+            <div style="margin-bottom: 1.75rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <label style="font-weight: 600; font-size: 0.95rem;">
+                        📁 اختيار ملفات Excel (.xlsx):
+                    </label>
+                    <span id="files-counter-badge" style="display: none; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.82rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        0 ملفات مختارة
+                    </span>
+                </div>
+
+                <div id="drop-zone" style="border: 2px dashed rgba(99, 102, 241, 0.4); border-radius: var(--radius-md); padding: 2.25rem 1.5rem; text-align: center; background: rgba(99, 102, 241, 0.03); transition: all 0.3s ease; position: relative;">
+                    <!-- حقل الملفات يدعم اختيار أكثر من ملف دفعة واحدة عبر multiple -->
+                    <input type="file" accept=".xlsx" id="file-input" multiple style="display: none;" onchange="handleFileSelect(event)" />
+                    
+                    <label for="file-input" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 0;">
+                        <span style="font-size: 3rem;">📊</span>
+                        <span id="drop-title" style="font-weight: 700; color: #a5b4fc; font-size: 1.1rem;">
+                            انقر هنا أو اسحب وأفلت ملفات الإكسيل (.xlsx)
+                        </span>
+                        <span style="font-size: 0.88rem; color: var(--text-muted); max-width: 520px; line-height: 1.6;">
+                            يمكنك تحديد <strong>أكثر من ملف في المرة الواحدة</strong> (مثل كشوف حوافز الإدارات المختلفة أو مسيرات المكافآت) ليتم دمجها وقراءتها للشهر المالي المختار.
+                        </span>
+                    </label>
+                </div>
+
+                <!-- جدول وقائمة الملفات المختارة -->
+                <div id="selected-files-container" style="display: none; margin-top: 1.25rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 0.5rem;">
+                        <span style="font-weight: 700; font-size: 0.9rem; color: #38bdf8;">
+                            📋 قائمة الملفات الجاهزة للقراءة والمعالجة:
+                        </span>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <label for="file-input" class="btn" style="cursor: pointer; padding: 0.25rem 0.65rem; font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.35);">
+                                ➕ إضافة ملفات أخرى
+                            </label>
+                            <button type="button" onclick="clearAllFiles()" class="btn" style="padding: 0.25rem 0.65rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                🗑️ مسح الكل
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="files-list-table" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 240px; overflow-y: auto;">
+                        <!-- يتم حقن كروت الملفات هنا عبر JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- زر بدء المعالجة -->
+            <button type="submit" id="btn-upload-submit" class="btn btn-admin" style="width: 100%; padding: 1.1rem; font-size: 1.15rem; font-weight: 700; justify-content: center; box-shadow: var(--shadow-glow);">
                 <span id="btn-icon">🚀</span> <span id="btn-text">بدء المعالجة وحفظ البيانات في الجداول</span>
             </button>
         </form>
 
         <!-- نافذة مؤشر التقدم الحي (Live Progress Modal Overlay) -->
-        <div id="progress-modal" style="display: none; position: absolute; inset: 0; background: rgba(11, 15, 25, 0.94); backdrop-filter: blur(8px); border-radius: var(--radius-lg); z-index: 50; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
-            <div style="width: 100%; max-width: 480px;">
+        <div id="progress-modal" style="display: none; position: absolute; inset: 0; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border-radius: var(--radius-lg); z-index: 50; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
+            <div style="width: 100%; max-width: 500px;">
                 <!-- أيقونة الدوران والنبض -->
-                <div style="font-size: 3.5rem; margin-bottom: 1.25rem; animation: pulse 1.5s infinite ease-in-out;">
+                <div style="font-size: 3.6rem; margin-bottom: 1.25rem; animation: pulse 1.5s infinite ease-in-out;">
                     ⚙️
                 </div>
 
-                <h3 id="progress-title" style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">
-                    جاري معالجة وتفريغ الملف...
+                <h3 id="progress-title" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">
+                    جاري قراءة وتفريغ الملفات...
                 </h3>
 
                 <!-- مؤشر المرحلة اللحظي -->
                 <p id="progress-status-text" style="color: #38bdf8; font-size: 0.95rem; font-weight: 600; margin-bottom: 1.25rem; min-height: 24px;">
-                    جاري رفع الملف إلى السيرفر...
+                    جاري رفع الملفات إلى الخادم وقراءتها...
                 </p>
 
                 <!-- شريط التقدم التفاعلي -->
@@ -129,19 +191,20 @@
                 </div>
 
                 <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--text-secondary); text-align: right;">
-                    🛡️ <strong>فحص ذكي للتكرار:</strong> يضمن النظام عدم تكرار أي موظف في نفس الشهر واستبدال أي نسخة سابقة لنفس الصرفية تلقائياً.
+                    🛡️ <strong>دمج ذكي لمنع التكرار:</strong> إذا تكرر نفس الموظف في أكثر من ملف خلال الشهر، يتم تجميع بنوده واستحقاقاته وصافيه تلقائياً وربطهما بالشهر المختار.
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- بطاقة التعليمات وقواعد منع التكرار -->
+    <!-- بطاقة التعليمات والربط بالشهر -->
     <div class="panel-card" style="margin-top: 1.5rem; background: rgba(255, 255, 255, 0.02);">
-        <h4 style="font-size: 0.95rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.5rem;">🛡️ القواعد الذكية لمعالجة الملفات:</h4>
-        <ul style="color: var(--text-secondary); font-size: 0.88rem; padding-right: 1.25rem; line-height: 1.8;">
-            <li><strong>منع التكرار التام:</strong> لا يمكن للموظف الحصول على أكثر من مرتب أو حافز لنفس الشهر؛ يتم تجاوز أي تكرار لنفس الموظف داخل الملف.</li>
-            <li><strong>إعادة الرفع الآمنة:</strong> في حال إعادة رفع ملف لنفس الشهر والنوع، يستبدل النظام الدفعة السابقة بالكامل بنظافة تامة.</li>
-            <li><strong>إمكانية المسح:</strong> يمكنك في أي وقت حذف بيانات أي شهر من شاشة التقرير إذا اكتشفت مشكلة في الشيت لإعادة رفعه مجدداً.</li>
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">🛡️ القواعد الذكية لمعالجة وربط الملفات المتعددة:</h4>
+        <ul style="color: var(--text-secondary); font-size: 0.88rem; padding-right: 1.25rem; line-height: 1.9;">
+            <li><strong>اختيار أكثر من ملف في المرة الواحدة:</strong> يمكنك تحديد عدة ملفات إكسيل من خلال نافذة الاختيار أو السحب والإفلات، كما يمكنك إضافة ملفات من مجلدات مختلفة بضغطة زر.</li>
+            <li><strong>الربط التلقائي بالشهر المالي:</strong> يتم ربط كافة الكشوف والبنود المستخرجة من الملفات المتعددة بنفس الشهر والسنة المحددة أعلاه.</li>
+            <li><strong>تجميع بنود الموظف المتعددة:</strong> في مسيرات الحوافز المتعددة لنفس الشهر (مثل حافز أداء + مكافأة امتحانات)، يدمج النظام مفردات الموظف في قسيمة واحدة مجمعة تعرض كل بند بدقة مع إجمالي الصافي.</li>
+            <li><strong>مرونة الاستبدال أو الإضافة:</strong> يمكنك إما استبدال بيانات الشهر بالكامل بنظافة، أو اختيار "دمج وإضافة" لإلحاق كشوف إدارة جديدة دون المساس بالبيانات المرفوعة سابقاً.</li>
         </ul>
     </div>
 </div>
@@ -151,44 +214,182 @@
         0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
         50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
     }
+    .file-item-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 0.6rem 0.85rem;
+        border-radius: var(--radius-sm);
+        transition: all 0.2s ease;
+    }
+    .file-item-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(99, 102, 241, 0.3);
+    }
 </style>
 
 @section Scripts {
     <script>
-        function updateFileLabel(input) {
-            const label = document.getElementById('file-label');
-            const subtext = document.getElementById('file-subtext');
-            const dropZone = document.getElementById('drop-zone');
+        // مصفوفة لتخزين الملفات المختارة عبر الجلسة
+        let selectedFiles = [];
 
-            if (input.files && input.files.length > 0) {
-                const file = input.files[0];
-                const sizeKb = (file.size / 1024).toFixed(1);
-                label.innerHTML = `✓ تم اختيار: <strong style="color: #fff;">${file.name}</strong> (${sizeKb} KB)`;
-                label.style.color = 'var(--success)';
-                subtext.innerText = 'الملف جاهز للمعالجة. اضغط على الزر بالأسفل للبدء.';
-                dropZone.style.borderColor = 'var(--success)';
-                dropZone.style.background = 'rgba(16, 185, 129, 0.05)';
-            } else {
-                label.innerText = 'انقر هنا لاختيار ملف الإكسيل (.xlsx)';
-                label.style.color = '#a5b4fc';
-                dropZone.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-                dropZone.style.background = 'rgba(99, 102, 241, 0.03)';
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const dropTitle = document.getElementById('drop-title');
+        const selectedContainer = document.getElementById('selected-files-container');
+        const filesListTable = document.getElementById('files-list-table');
+        const filesBadge = document.getElementById('files-counter-badge');
+        const btnSubmit = document.getElementById('btn-upload-submit');
+        const btnText = document.getElementById('btn-text');
+        const errorBox = document.getElementById('error-alert-box');
+        const errorMsg = document.getElementById('error-message-text');
+
+        // معالجة السحب والإفلات (Drag & Drop)
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.style.borderColor = 'var(--primary)';
+                dropZone.style.background = 'rgba(99, 102, 241, 0.1)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.style.borderColor = selectedFiles.length > 0 ? 'var(--success)' : 'rgba(99, 102, 241, 0.4)';
+                dropZone.style.background = selectedFiles.length > 0 ? 'rgba(16, 185, 129, 0.04)' : 'rgba(99, 102, 241, 0.03)';
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            if (dt && dt.files && dt.files.length > 0) {
+                addFiles(dt.files);
+            }
+        });
+
+        function handleFileSelect(e) {
+            if (e.target.files && e.target.files.length > 0) {
+                addFiles(e.target.files);
+            }
+            // إعادة ضبط الحقل ليسمح باختيار نفس الملف إذا رغب المستخدم
+            e.target.value = '';
+        }
+
+        function addFiles(fileList) {
+            errorBox.style.display = 'none';
+            let invalidCount = 0;
+
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                if (!file.name.toLowerCase().endsWith('.xlsx')) {
+                    invalidCount++;
+                    continue;
+                }
+
+                // منع تكرار نفس الملف بنفس الاسم والحجم
+                const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+                if (!isDuplicate) {
+                    selectedFiles.push(file);
+                }
+            }
+
+            if (invalidCount > 0) {
+                errorBox.style.display = 'block';
+                errorMsg.innerText = `تم استبعاد ${invalidCount} ملف غير صالح. الملفات المدعومة هي بصيغة Excel (.xlsx) فقط.`;
+            }
+
+            renderFilesUI();
+        }
+
+        function removeFile(index) {
+            if (index >= 0 && index < selectedFiles.length) {
+                selectedFiles.splice(index, 1);
+                renderFilesUI();
             }
         }
 
-        // معالجة الرفع عبر AJAX مع شريط تقدم ومؤشر زمني حي
+        function clearAllFiles() {
+            selectedFiles = [];
+            renderFilesUI();
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function renderFilesUI() {
+            if (selectedFiles.length === 0) {
+                selectedContainer.style.display = 'none';
+                filesBadge.style.display = 'none';
+                dropTitle.innerHTML = 'انقر هنا أو اسحب وأفلت ملفات الإكسيل (.xlsx)';
+                dropTitle.style.color = '#a5b4fc';
+                dropZone.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+                dropZone.style.background = 'rgba(99, 102, 241, 0.03)';
+                btnText.innerText = 'بدء المعالجة وحفظ البيانات في الجداول';
+                return;
+            }
+
+            selectedContainer.style.display = 'block';
+            filesBadge.style.display = 'inline-block';
+            filesBadge.innerText = `${selectedFiles.length} ملفات مختارة`;
+
+            const totalSize = selectedFiles.reduce((acc, f) => acc + f.size, 0);
+            dropTitle.innerHTML = `✓ تم اختيار <strong style="color: #fff;">${selectedFiles.length}</strong> ملف (${formatBytes(totalSize)})`;
+            dropTitle.style.color = 'var(--success)';
+            dropZone.style.borderColor = 'var(--success)';
+            dropZone.style.background = 'rgba(16, 185, 129, 0.04)';
+
+            const monthVal = document.getElementById('select-month').value;
+            const yearVal = document.getElementById('select-year').value;
+            btnText.innerText = `بدء معالجة (${selectedFiles.length}) ملفات وربطها بشهر ${monthVal}/${yearVal}`;
+
+            // بناء عناصر الجدول
+            filesListTable.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item-card';
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.75rem; overflow: hidden;">
+                        <span style="font-size: 1.4rem;">📊</span>
+                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <strong style="color: #fff; font-size: 0.92rem; display: block; overflow: hidden; text-overflow: ellipsis;">${file.name}</strong>
+                            <small style="color: var(--text-muted); font-size: 0.78rem;">${formatBytes(file.size)}</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span style="font-size: 0.75rem; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.2rem 0.5rem; border-radius: 9999px;">
+                            جاهز للقراءة
+                        </span>
+                        <button type="button" onclick="removeFile(${index})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 1.1rem; padding: 0.2rem;" title="حذف هذا الملف">
+                            ✕
+                        </button>
+                    </div>
+                `;
+                filesListTable.appendChild(item);
+            });
+        }
+
+        // تحديث نص الزر عند تغيير الشهر أو السنة
+        document.getElementById('select-month').addEventListener('change', renderFilesUI);
+        document.getElementById('select-year').addEventListener('change', renderFilesUI);
+
+        // إرسال النموذج عبر AJAX لقراءة ومعالجة كافة الملفات وربطها بالشهر
         document.getElementById('upload-payroll-form').addEventListener('submit', async function (e) {
             e.preventDefault();
-
-            const fileInput = document.getElementById('file-input');
-            const errorBox = document.getElementById('error-alert-box');
-            const errorMsg = document.getElementById('error-message-text');
-
             errorBox.style.display = 'none';
 
-            if (!fileInput.files || fileInput.files.length === 0) {
+            if (selectedFiles.length === 0) {
                 errorBox.style.display = 'block';
-                errorMsg.innerText = 'يرجى اختيار ملف الإكسيل (.xlsx) أولاً.';
+                errorMsg.innerText = 'يرجى اختيار ملف إكسيل واحد على الأقل بصيغة (.xlsx).';
                 return;
             }
 
@@ -209,24 +410,41 @@
                 timerLabel.innerText = `⏱️ الوقت المنقضي: ${mins}:${secs} ث`;
             }, 1000);
 
-            // تسلسل مراحل محاكاة التقدم
+            const filesCount = selectedFiles.length;
+            title.innerText = `جاري معالجة ودمج (${filesCount}) ملفات...`;
+
+            // مراحل شريط التقدم
             fill.style.width = '25%';
             percentLabel.innerText = '25%';
-            statusText.innerText = 'جاري رفع الملف إلى السيرفر وقراءة أوراق العمل (EPPlus)...';
+            statusText.innerText = `جاري رفع (${filesCount}) ملفات إلى الخادم وقراءة أوراق العمل...`;
 
             const stage2Timeout = setTimeout(() => {
                 fill.style.width = '55%';
                 percentLabel.innerText = '55%';
-                statusText.innerText = 'جاري تفريغ بيانات الموظفين وفحص ومنع تكرار الصرفيات...';
-            }, 1500);
+                statusText.innerText = `جاري تفريغ كشوف الموظفين ودمج بنود الاستحقاقات والاستقطاعات للشهر...`;
+            }, 1600);
 
             const stage3Timeout = setTimeout(() => {
                 fill.style.width = '85%';
                 percentLabel.innerText = '85%';
-                statusText.innerText = 'جاري تسجيل بنود الاستحقاقات والاستقطاعات وحفظها في قاعدة البيانات...';
-            }, 3000);
+                statusText.innerText = `جاري حفظ السجلات والربط بالشهر المالي في قاعدة البيانات...`;
+            }, 3200);
 
-            const formData = new FormData(this);
+            // تجهيز FormData مع كافة الملفات
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+            formData.append('Year', document.getElementById('select-year').value);
+            formData.append('Month', document.getElementById('select-month').value);
+            
+            const selectedType = document.querySelector('input[name="PayrollType"]:checked')?.value || 'حوافز';
+            formData.append('PayrollType', selectedType);
+
+            const appendVal = document.querySelector('input[name="AppendToExisting"]:checked')?.value || 'false';
+            formData.append('AppendToExisting', appendVal);
+
+            selectedFiles.forEach(file => {
+                formData.append('ExcelFiles', file);
+            });
 
             try {
                 const response = await fetch('@Url.Action("UploadAjax", "Payroll", new { area = "Admin" })', {
@@ -244,8 +462,8 @@
                     fill.style.width = '100%';
                     percentLabel.innerText = '100%';
                     fill.style.background = 'var(--success)';
-                    title.innerText = '✅ اكتملت المعالجة بنجاح!';
-                    statusText.innerText = `تم استيراد ${data.count} موظف بنجاح بإجمالي صافي ${data.totalNet} ج.م! جاري نقلك لتقرير الشهر...`;
+                    title.innerText = '✅ اكتملت قراءة ومعالجة الملفات بنجاح!';
+                    statusText.innerText = `تم استيراد ${data.count} موظف من (${data.filesCount || filesCount}) ملفات بإجمالي صافي ${data.totalNet} ج.م! جاري نقلك للتقرير...`;
 
                     setTimeout(() => {
                         window.location.href = data.redirectUrl;
@@ -253,7 +471,7 @@
                 } else {
                     modal.style.display = 'none';
                     errorBox.style.display = 'block';
-                    errorMsg.innerText = data.message || 'حدث خطأ غير متوقع أثناء معالجة الملف.';
+                    errorMsg.innerText = data.message || 'حدث خطأ غير متوقع أثناء معالجة الملفات.';
                 }
             } catch (err) {
                 clearInterval(timerInterval);
@@ -261,7 +479,7 @@
                 clearTimeout(stage3Timeout);
                 modal.style.display = 'none';
                 errorBox.style.display = 'block';
-                errorMsg.innerText = 'تعذر الاتصال بالسيرفر أثناء رفع الملف: ' + err.message;
+                errorMsg.innerText = 'تعذر الاتصال بالسيرفر أثناء رفع ومعالجة الملفات: ' + err.message;
             }
         });
     </script>

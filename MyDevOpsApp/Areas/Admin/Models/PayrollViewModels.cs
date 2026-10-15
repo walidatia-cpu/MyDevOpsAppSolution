@@ -18,9 +18,14 @@ public class PayrollUploadViewModel
     [Display(Name = "نوع الملف")]
     public string PayrollType { get; set; } = "مرتبات"; // "مرتبات" أو "حوافز"
 
-    [Required(ErrorMessage = "يرجى اختيار ملف الإكسيل (.xlsx)")]
     [Display(Name = "ملف الإكسيل")]
     public IFormFile? ExcelFile { get; set; }
+
+    [Display(Name = "ملفات الإكسيل")]
+    public List<IFormFile> ExcelFiles { get; set; } = new();
+
+    [Display(Name = "طريقة الإدراج")]
+    public bool AppendToExisting { get; set; } = false;
 }
 
 public class PayrollReportViewModel
