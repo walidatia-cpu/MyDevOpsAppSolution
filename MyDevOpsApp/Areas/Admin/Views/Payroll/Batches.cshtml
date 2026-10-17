@@ -65,16 +65,16 @@
                             <td style="font-size: 0.85rem; color: var(--text-secondary); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@batch.OriginalFileName">📁 @batch.OriginalFileName</td>
                             <td style="font-weight: 600;">@batch.TotalEmployeesCount</td>
                             <td style="color: var(--success); font-weight: 600;">@batch.TotalEarningsSum.ToString("N2")</td>
-                            <td style="color: #38bdf8; font-weight: 700;">@batch.TotalNetSum.ToString("N2")</td>
+                            <td class="text-accent-net">@batch.TotalNetSum.ToString("N2")</td>
                             <td style="color: var(--text-muted); font-size: 0.85rem;">@batch.UploadedAt.ToString("yyyy-MM-dd HH:mm")</td>
                             <td style="display: flex; gap: 0.5rem; align-items: center;">
                                 <a asp-action="Report" asp-route-year="@batch.Year" asp-route-month="@batch.Month" asp-route-type="@batch.PayrollType"
-                                   class="btn" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); color: #c7d2fe;">
+                                   class="btn-action-subtle">
                                     عرض التقرير 📊
                                 </a>
                                 <form asp-action="DeleteBatch" asp-route-id="@batch.Id" method="post" onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذه الدفعة وجميع سجلاتها؟');" style="display: inline;">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                                    <button type="submit" class="btn" style="padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 700; background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.35); border-radius: var(--radius-sm); cursor: pointer;">
                                         حذف 🗑️
                                     </button>
                                 </form>

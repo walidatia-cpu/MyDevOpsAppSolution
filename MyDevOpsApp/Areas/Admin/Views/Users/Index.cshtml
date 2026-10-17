@@ -16,7 +16,7 @@
         </p>
     </div>
     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <button type="button" onclick="window.print()" class="btn" style="background: rgba(255, 255, 255, 0.08); color: #fff; padding: 0.6rem 1.1rem;">
+        <button type="button" onclick="window.print()" class="btn-action-subtle" style="padding: 0.6rem 1.1rem;">
             🖨️ طباعة السجل
         </button>
         <a asp-controller="Account" asp-action="RegisterEmployee" asp-area="" target="_blank" class="btn btn-admin" style="padding: 0.6rem 1.25rem;">
@@ -29,7 +29,7 @@
 <div class="metrics-grid" style="margin-bottom: 2rem;">
     <!-- إجمالي المستخدمين -->
     <div class="metric-card">
-        <div class="metric-icon" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc;">
+        <div class="metric-icon" style="background: rgba(99, 102, 241, 0.15); color: var(--primary);">
             👥
         </div>
         <div class="metric-info">
@@ -51,12 +51,12 @@
 
     <!-- مسؤولو النظام -->
     <div class="metric-card">
-        <div class="metric-icon" style="background: rgba(244, 63, 94, 0.15); color: #fb7185;">
+        <div class="metric-icon" style="background: var(--danger-bg); color: var(--danger);">
             🛡️
         </div>
         <div class="metric-info">
             <h4>مسؤولو النظام (Admins)</h4>
-            <div class="metric-value" style="color: #fda4af;">@Model.AdminsCount</div>
+            <div class="metric-value" style="color: var(--danger);">@Model.AdminsCount</div>
         </div>
     </div>
 
@@ -106,7 +106,7 @@
                                     @(string.IsNullOrWhiteSpace(user.FullName) ? "U" : user.FullName.Trim().Substring(0, 1))
                                 </div>
                                 <div>
-                                    <strong style="color: #fff; font-size: 0.95rem; display: block;">@user.FullName</strong>
+                                    <strong style="color: var(--text-primary); font-size: 0.95rem; display: block;">@user.FullName</strong>
                                     <span style="color: var(--text-muted); font-size: 0.8rem; direction: ltr; display: inline-block;">@user.Email</span>
                                 </div>
                             </div>
@@ -116,13 +116,13 @@
                         <td>
                             @if (!string.IsNullOrEmpty(user.NationalId))
                             {
-                                <div style="font-family: monospace; font-size: 0.88rem; color: #cbd5e1; direction: ltr; text-align: right;">
+                                <div style="font-family: monospace; font-size: 0.88rem; color: var(--text-primary); direction: ltr; text-align: right;">
                                     @user.NationalId
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(user.PaymentNumber))
                             {
-                                <small style="color: #38bdf8; font-weight: 600;">ملف: #@user.PaymentNumber</small>
+                                <small style="color: var(--info); font-weight: 600;">ملف: #@user.PaymentNumber</small>
                             }
                             @if (string.IsNullOrEmpty(user.NationalId) && string.IsNullOrEmpty(user.PaymentNumber))
                             {
@@ -155,7 +155,7 @@
 
                         <!-- تاريخ التسجيل -->
                         <td data-order="@user.CreatedAt.ToString("yyyyMMddHHmmss")">
-                            <strong style="font-size: 0.88rem; color: #e2e8f0; display: block;">
+                            <strong style="font-size: 0.88rem; color: var(--text-primary); display: block;">
                                 @user.CreatedAt.ToString("yyyy-MM-dd")
                             </strong>
                             <small style="color: var(--text-muted); font-size: 0.78rem;">
@@ -186,13 +186,13 @@
                         <td>
                             @if (user.LastLoginAt.HasValue)
                             {
-                                <span class="badge" style="background: @(user.IsRecentlyActive ? "rgba(16, 185, 129, 0.15)" : "rgba(255, 255, 255, 0.05)"); color: @(user.IsRecentlyActive ? "#34d399" : "var(--text-muted)"); border: 1px solid @(user.IsRecentlyActive ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"); font-size: 0.8rem;">
+                                <span class="badge" style="background: @(user.IsRecentlyActive ? "rgba(16, 185, 129, 0.15)" : "var(--hover-overlay)"); color: @(user.IsRecentlyActive ? "var(--success)" : "var(--text-muted)"); border: 1px solid @(user.IsRecentlyActive ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"); font-size: 0.8rem;">
                                     @user.LastLoginTimeAgo
                                 </span>
                             }
                             else
                             {
-                                <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.25); font-size: 0.8rem;">
+                                <span class="badge" style="background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); font-size: 0.8rem;">
                                     حساب جديد
                                 </span>
                             }

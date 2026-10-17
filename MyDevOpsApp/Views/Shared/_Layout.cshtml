@@ -1,11 +1,35 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - بوابة الاستعلام عن المرتبات والحوافز</title>
     <meta name="description" content="المنظومة الرقمية للاستعلام عن مسيرات وكشوف المرتبات والحوافز الشهرية ومفردات المرتب" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script>
+        (function () {
+            var key = 'app-theme-preference';
+            var saved = localStorage.getItem(key) || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+
+            var lastClick = 0;
+            window.toggleTheme = function () {
+                var now = Date.now();
+                if (now - lastClick < 250) return;
+                lastClick = now;
+
+                var current = (document.documentElement.getAttribute('data-theme') || 'light').toLowerCase();
+                var next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                try {
+                    localStorage.setItem(key, next);
+                } catch (e) {}
+                if (window.updateThemeUI) {
+                    window.updateThemeUI(next);
+                }
+            };
+        })();
+    </script>
 </head>
 <body>
     <header class="main-header">
@@ -16,18 +40,27 @@
             </a>
             <ul class="nav-links">
                 <li><a class="nav-link" id="nav-link-home" asp-area="" asp-controller="Home" asp-action="Index">الرئيسية 🏠</a></li>
-                <li><a class="nav-link btn-area-employee" id="nav-link-employee-area" asp-area="Employees" asp-controller="Dashboard" asp-action="Index">بوابة الموظف (استعلام المرتب) 💼</a></li>
-                <li><a class="nav-link btn-area-admin" id="nav-link-admin-area" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">إدارة الرواتب (الماليات) ⚡</a></li>
+                <li><a class="nav-link btn-area-employee" id="nav-link-employee-area" asp-area="Employees" asp-controller="Dashboard" asp-action="Index">بوابة الموظف 💼</a></li>
+                <li><a class="nav-link btn-area-admin" id="nav-link-admin-area" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">إدارة الرواتب ⚡</a></li>
+
+                <li>
+                    <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="تبديل المظهر" title="تبديل الوضع (داكن / فاتح)">
+                        <span class="theme-segmented">
+                            <span class="theme-opt opt-dark">🌙 داكن</span>
+                            <span class="theme-opt opt-light">☀️ فاتح</span>
+                        </span>
+                    </button>
+                </li>
 
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <li style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: #93c5fd; background: rgba(37, 99, 235, 0.12); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(37, 99, 235, 0.25);">
+                    <li style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.35rem;">
+                        <span class="user-badge">
                             👤 @User.Identity.Name
                         </span>
                         <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(244, 63, 94, 0.12); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.25);">
+                            <button type="submit" class="btn-logout" title="تسجيل الخروج">
                                 خروج 🚪
                             </button>
                         </form>
@@ -53,7 +86,7 @@
         <p>&copy; @DateTime.Now.Year - البوابة الرقمية للاستعلام عن المرتبات والمستحقات المالية - سرية تامة وأمان كامل لكافة البيانات</p>
     </footer>
 
-    <script src="~/js/site.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

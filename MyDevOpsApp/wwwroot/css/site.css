@@ -1,8 +1,8 @@
 /* Modern Design System for MyDevOpsApp */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
-    color-scheme: dark;
+:root, [data-theme="light"] {
+    color-scheme: light;
     --font-sans: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     
     /* Refined & Soft Corporate Color Palette */
@@ -17,7 +17,69 @@
     --employee-accent: #0284c7;
     --employee-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     
-    /* Soft Slate Surfaces (Much calmer and easier on the eyes than harsh black) */
+    /* Light Mode Surfaces - Clean, Crisp & Modern Corporate Look (Default) */
+    --surface-bg: #f8fafc;
+    --surface-card: #ffffff;
+    --surface-card-hover: #f1f5f9;
+    --surface-card-glass: rgba(255, 255, 255, 0.95);
+    --border-color: #cbd5e1;
+    --border-glass: rgba(0, 0, 0, 0.08);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    
+    --header-bg: rgba(255, 255, 255, 0.95);
+    --sidebar-bg: #ffffff;
+    --hover-overlay: rgba(0, 0, 0, 0.04);
+
+    /* Inputs & Form Controls */
+    --input-bg: #ffffff;
+    --input-bg-focus: #f8fafc;
+    --input-color: #0f172a;
+    --input-placeholder: #64748b;
+
+    /* Tables */
+    --table-header-bg: #f1f5f9;
+    --table-header-color: #1e293b;
+    --table-row-hover: rgba(59, 130, 246, 0.04);
+
+    /* Dynamic Badges & Accents (Light Mode High-Contrast) */
+    --badge-number-color: #4338ca;
+    --badge-net-color: #0284c7;
+    --badge-primary-color: #1d4ed8;
+    --badge-info-color: #0369a1;
+    --btn-action-bg: rgba(79, 70, 229, 0.12);
+    --btn-action-color: #3730a3;
+    --btn-action-border: rgba(79, 70, 229, 0.3);
+
+    --success: #059669;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --warning: #d97706;
+    --warning-bg: rgba(245, 158, 11, 0.1);
+    --info: #0284c7;
+    --info-bg: rgba(2, 132, 199, 0.1);
+    --danger: #be123c;
+    --danger-bg: rgba(190, 18, 60, 0.1);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-full: 9999px;
+    
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.07);
+    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.09);
+    --shadow-glow: 0 4px 14px rgba(37, 99, 235, 0.12);
+    
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+    
+    /* Dark Mode Surfaces */
     --surface-bg: #0f172a;
     --surface-card: #1e293b;
     --surface-card-hover: #273549;
@@ -29,27 +91,43 @@
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
     
+    --header-bg: rgba(15, 23, 42, 0.9);
+    --sidebar-bg: #131d31;
+    --hover-overlay: rgba(255, 255, 255, 0.05);
+
+    /* Inputs & Form Controls */
+    --input-bg: #1e293b;
+    --input-bg-focus: #243047;
+    --input-color: #f8fafc;
+    --input-placeholder: #64748b;
+
+    /* Tables */
+    --table-header-bg: #1a2438;
+    --table-header-color: #94a3b8;
+    --table-row-hover: rgba(59, 130, 246, 0.06);
+
+    /* Dynamic Badges & Accents */
+    --badge-number-color: #a5b4fc;
+    --badge-net-color: #38bdf8;
+    --badge-primary-color: #93c5fd;
+    --badge-info-color: #38bdf8;
+    --btn-action-bg: rgba(99, 102, 241, 0.2);
+    --btn-action-color: #c7d2fe;
+    --btn-action-border: rgba(99, 102, 241, 0.4);
+
     --success: #10b981;
     --success-bg: rgba(16, 185, 129, 0.12);
     --warning: #f59e0b;
     --warning-bg: rgba(245, 158, 11, 0.12);
-    --info: #0284c7;
+    --info: #38bdf8;
     --info-bg: rgba(2, 132, 199, 0.12);
     --danger: #f43f5e;
     --danger-bg: rgba(244, 63, 94, 0.12);
 
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 18px;
-    --radius-full: 9999px;
-    
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
     --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
     --shadow-glow: 0 4px 14px rgba(37, 99, 235, 0.2);
-    
-    --transition-fast: 0.15s ease;
-    --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -76,21 +154,24 @@ a {
 
 /* Header & Navbar */
 .main-header {
-    background: rgba(15, 23, 42, 0.9);
+    background: var(--header-bg);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
     z-index: 50;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .navbar {
-    max-width: 1280px;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 0.9rem 1.5rem;
+    padding: 0.75rem 1.75rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
 }
 
 .brand-logo {
@@ -98,8 +179,10 @@ a {
     align-items: center;
     gap: 0.75rem;
     font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .brand-badge {
@@ -110,29 +193,76 @@ a {
     color: #fff;
     font-weight: 600;
     box-shadow: var(--shadow-glow);
+    white-space: nowrap;
 }
 
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 0.75rem;
     list-style: none;
+    flex-wrap: nowrap;
 }
 
 .nav-link {
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    transition: color var(--transition-fast);
-    padding: 0.4rem 0.8rem;
+    transition: all var(--transition-fast);
+    padding: 0.45rem 0.85rem;
     border-radius: var(--radius-sm);
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-link:hover, .nav-link.active {
     color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--hover-overlay);
+}
+
+/* Header User Badge & Logout Button */
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-sm);
+    background: var(--info-bg);
+    color: var(--badge-net-color) !important;
+    border: 1px solid rgba(2, 132, 199, 0.35);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    background: var(--danger-bg);
+    color: var(--danger) !important;
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    font-family: inherit;
+    flex-shrink: 0;
+}
+
+.btn-logout:hover {
+    background: var(--danger);
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(244, 63, 94, 0.35);
 }
 
 .nav-link.btn-area-admin {
@@ -172,13 +302,13 @@ a {
 
 .area-sidebar {
     width: 270px;
-    background: #131d31;
+    background: var(--sidebar-bg);
     border-left: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     padding: 1.5rem 1rem;
     flex-shrink: 0;
-    transition: width var(--transition-base);
+    transition: width var(--transition-base), background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .sidebar-brand {
@@ -216,7 +346,7 @@ a {
 }
 
 .sidebar-menu-item a:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--hover-overlay);
     color: var(--text-primary);
     transform: translateX(-3px);
 }
@@ -279,6 +409,18 @@ a {
     background: linear-gradient(135deg, #ffffff 30%, #9ca3af 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .hero-title {
+    background: linear-gradient(135deg, #0f172a 30%, #475569 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .hero-pill {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: rgba(37, 99, 235, 0.2);
+    color: #1d4ed8;
 }
 
 .hero-title .gradient-text {
@@ -531,8 +673,8 @@ a {
 .custom-table th {
     text-align: right;
     padding: 0.85rem 1rem;
-    background: rgba(255, 255, 255, 0.02);
-    color: var(--text-secondary);
+    background: var(--table-header-bg);
+    color: var(--table-header-color);
     font-weight: 600;
     border-bottom: 1px solid var(--border-color);
 }
@@ -544,7 +686,7 @@ a {
 }
 
 .custom-table tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--table-row-hover);
 }
 
 /* Badges */
@@ -570,14 +712,50 @@ a {
 
 .badge-info {
     background: var(--info-bg);
-    color: #38bdf8;
-    border: 1px solid rgba(2, 132, 199, 0.3);
+    color: var(--badge-info-color);
+    border: 1px solid rgba(2, 132, 199, 0.35);
 }
 
 .badge-primary {
     background: rgba(37, 99, 235, 0.12);
-    color: #93c5fd;
-    border: 1px solid rgba(37, 99, 235, 0.25);
+    color: var(--badge-primary-color);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+/* Common subtle action button & typography helpers */
+.btn-action-subtle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.8rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    background: var(--btn-action-bg);
+    color: var(--btn-action-color) !important;
+    border: 1px solid var(--btn-action-border);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-action-subtle:hover {
+    background: var(--primary);
+    color: #ffffff !important;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.text-accent-net {
+    color: var(--badge-net-color) !important;
+    font-weight: 700;
+}
+
+.text-accent-number {
+    color: var(--badge-number-color) !important;
+    font-weight: 700;
 }
 
 /* Progress bar */
@@ -634,14 +812,13 @@ a {
 }
 
 /* ==========================================================================
-   Dark Dropdowns & Form Controls (Fixing native select white popup)
+   Dropdowns & Form Controls (Dynamic Theme Integration)
    ========================================================================== */
 select,
 .form-select,
 .form-control select {
-    color-scheme: dark;
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
+    background-color: var(--input-bg) !important;
+    color: var(--input-color) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: var(--radius-sm);
     padding: 0.65rem 1rem;
@@ -659,20 +836,26 @@ select,
     transition: all var(--transition-fast);
 }
 
+[data-theme="light"] select,
+[data-theme="light"] .form-select,
+[data-theme="light"] .form-control select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+}
+
 select:focus,
 .form-select:focus,
 .form-control select:focus {
     outline: none;
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
-    background-color: #243047 !important;
+    background-color: var(--input-bg-focus) !important;
 }
 
 /* Options within native dropdowns */
 select option,
 select optgroup {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
+    background-color: var(--input-bg) !important;
+    color: var(--input-color) !important;
     padding: 10px 14px !important;
     font-size: 0.95rem;
 }
@@ -690,15 +873,20 @@ input[type="password"],
 input[type="number"],
 input[type="search"],
 .form-control {
-    color-scheme: dark;
-    background-color: #1e293b;
-    color: #f8fafc;
+    background-color: var(--input-bg);
+    color: var(--input-color);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     padding: 0.65rem 1rem;
     font-family: var(--font-sans);
     font-size: 0.95rem;
     transition: all var(--transition-fast);
+}
+
+input::placeholder,
+.form-control::placeholder {
+    color: var(--input-placeholder);
+    opacity: 0.85;
 }
 
 input[type="text"]:focus,
@@ -710,11 +898,11 @@ input[type="search"]:focus,
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    background-color: #243047;
+    background-color: var(--input-bg-focus);
 }
 
 /* ==========================================================================
-   DataTables Dark Theme Integration (Arabic RTL)
+   DataTables Theme Integration (Dynamic Arabic RTL)
    ========================================================================= */
 .dataTables_wrapper {
     color: var(--text-primary);
@@ -738,9 +926,9 @@ input[type="search"]:focus,
 }
 
 .dataTables_wrapper .dataTables_filter input {
-    background-color: #1e293b !important;
+    background-color: var(--input-bg) !important;
     border: 1px solid var(--border-color) !important;
-    color: #fff !important;
+    color: var(--input-color) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0.5rem 1rem !important;
     margin-right: 0.5rem !important;
@@ -753,13 +941,13 @@ input[type="search"]:focus,
 .dataTables_wrapper .dataTables_filter input:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
-    background-color: #243047 !important;
+    background-color: var(--input-bg-focus) !important;
 }
 
 .dataTables_wrapper .dataTables_length select {
-    background-color: #1e293b !important;
+    background-color: var(--input-bg) !important;
     border: 1px solid var(--border-color) !important;
-    color: #fff !important;
+    color: var(--input-color) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0.4rem 2rem 0.4rem 0.75rem !important;
     margin: 0 0.5rem !important;
@@ -776,8 +964,8 @@ table.dataTable {
 }
 
 table.dataTable thead th {
-    background-color: #1a2438 !important;
-    color: #94a3b8 !important;
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-color) !important;
     font-weight: 700 !important;
     border-bottom: 2px solid var(--border-color) !important;
     padding: 0.85rem 1rem !important;
@@ -790,7 +978,7 @@ table.dataTable tbody tr {
 }
 
 table.dataTable tbody tr:hover {
-    background-color: rgba(59, 130, 246, 0.06) !important;
+    background-color: var(--table-row-hover) !important;
 }
 
 table.dataTable tbody td {
@@ -816,9 +1004,9 @@ table.dataTable tbody td {
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {
-    background: #1e293b !important;
+    background: var(--surface-card) !important;
     border: 1px solid var(--border-color) !important;
-    color: #cbd5e1 !important;
+    color: var(--text-secondary) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0.4rem 0.85rem !important;
     font-size: 0.88rem !important;
@@ -827,9 +1015,9 @@ table.dataTable tbody td {
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background: #2563eb !important;
+    background: var(--primary) !important;
     color: #fff !important;
-    border-color: #2563eb !important;
+    border-color: var(--primary) !important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current,
@@ -845,7 +1033,84 @@ table.dataTable tbody td {
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
     opacity: 0.4 !important;
     cursor: not-allowed !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border-color: rgba(255, 255, 255, 0.05) !important;
+    background: var(--surface-card) !important;
+    border-color: var(--border-color) !important;
     color: var(--text-muted) !important;
+}
+
+/* ==========================================================================
+   Theme Switcher Component (Interactive Segmented Pill)
+   ========================================================================== */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: 3px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    outline: none;
+    user-select: none;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.98);
+}
+
+.theme-segmented {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.theme-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: var(--radius-full);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-muted);
+}
+
+/* In Light Mode (Default): light option is highlighted */
+:root .theme-opt.opt-light,
+[data-theme="light"] .theme-opt.opt-light {
+    background: #ffffff;
+    color: #0284c7 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    border: 1px solid #cbd5e1;
+}
+
+:root .theme-opt.opt-dark,
+[data-theme="light"] .theme-opt.opt-dark {
+    background: transparent;
+    color: var(--text-muted);
+    box-shadow: none;
+    border: none;
+}
+
+/* In Dark Mode: dark option is highlighted */
+[data-theme="dark"] .theme-opt.opt-dark {
+    background: var(--primary-gradient);
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+    border: none;
+}
+
+[data-theme="dark"] .theme-opt.opt-light {
+    background: transparent;
+    color: var(--text-muted);
+    box-shadow: none;
+    border: none;
 }

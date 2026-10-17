@@ -17,7 +17,7 @@
         @if (Model.CurrentBatch != null)
         {
             <button type="button" onclick="openDeleteMonthModal()" class="btn"
-                    style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171;">
+                    style="background: var(--danger-bg); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); font-weight: 600;">
                 🗑️ حذف بيانات هذا الشهر بالكامل
             </button>
         }
@@ -61,7 +61,7 @@
         <div style="flex: 1; min-width: 220px;">
             <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">بحث (الاسم / رقم الملف / الرقم القومي):</label>
             <input type="text" name="search" value="@Model.SearchQuery" placeholder="اكتب اسم الموظف أو رقمه القومي..."
-                   style="width: 100%; padding: 0.5rem 0.85rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem;" />
+                   class="form-control" style="width: 100%; font-size: 0.9rem;" />
         </div>
 
         <div>
@@ -90,7 +90,7 @@ else
     <!-- بطاقات الإجماليات للشهر المحدد -->
     <div class="metrics-grid">
         <div class="metric-card">
-            <div class="metric-icon" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc;">
+            <div class="metric-icon" style="background: rgba(99, 102, 241, 0.15); color: var(--badge-number-color);">
                 👥
             </div>
             <div class="metric-info">
@@ -100,7 +100,7 @@ else
         </div>
 
         <div class="metric-card">
-            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+            <div class="metric-icon" style="background: var(--success-bg); color: var(--success);">
                 📈
             </div>
             <div class="metric-info">
@@ -110,7 +110,7 @@ else
         </div>
 
         <div class="metric-card">
-            <div class="metric-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+            <div class="metric-icon" style="background: var(--danger-bg); color: var(--danger);">
                 📉
             </div>
             <div class="metric-info">
@@ -120,12 +120,12 @@ else
         </div>
 
         <div class="metric-card">
-            <div class="metric-icon" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8;">
+            <div class="metric-icon" style="background: var(--info-bg); color: var(--badge-net-color);">
                 💵
             </div>
             <div class="metric-info">
                 <h4>صافي الصرف (الصافي)</h4>
-                <div class="metric-value" style="font-size: 1.4rem; color: #38bdf8;">@Model.TotalNet.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
+                <div class="metric-value text-accent-net" style="font-size: 1.4rem;">@Model.TotalNet.ToString("N2") <small style="font-size: 0.8rem;">ج.م</small></div>
             </div>
         </div>
     </div>
@@ -160,17 +160,16 @@ else
                     @foreach (var rec in Model.FilteredRecords)
                     {
                         <tr>
-                            <td style="font-weight: 700; color: #a5b4fc;">#@rec.PaymentNumber</td>
+                            <td class="text-accent-number" style="font-weight: 700;">#@rec.PaymentNumber</td>
                             <td style="direction: ltr; text-align: right; color: var(--text-secondary); font-family: monospace;">@rec.NationalId</td>
                             <td style="font-weight: 600;">@rec.EmployeeName</td>
                             <td style="color: var(--text-secondary); font-size: 0.88rem;">@rec.Department</td>
                             <td><span class="badge badge-info">@rec.Grade</span></td>
                             <td style="color: var(--success); font-weight: 600;">@rec.TotalEarnings.ToString("N2")</td>
                             <td style="color: var(--danger); font-weight: 600;">@rec.TotalDeductions.ToString("N2")</td>
-                            <td style="color: #38bdf8; font-weight: 700; font-size: 1.05rem;">@rec.NetAmount.ToString("N2")</td>
+                            <td class="text-accent-net" style="font-size: 1.05rem;">@rec.NetAmount.ToString("N2")</td>
                             <td>
-                                <a asp-action="RecordDetails" asp-route-id="@rec.Id" class="btn"
-                                   style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); color: #c7d2fe;">
+                                <a asp-action="RecordDetails" asp-route-id="@rec.Id" class="btn-action-subtle">
                                     تفاصيل الإجمالي 🔍
                                 </a>
                             </td>

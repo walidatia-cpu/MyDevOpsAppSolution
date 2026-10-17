@@ -4,7 +4,7 @@
 }
 
 <div style="margin-bottom: 2rem;">
-    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); padding: 0.35rem 0.85rem; border-radius: 9999px; color: #a5b4fc; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); padding: 0.35rem 0.85rem; border-radius: 9999px; color: var(--primary); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">
         ⚡ معالجة متعددة الملفات (Multi-File Processing)
     </div>
     <h1 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 0.5rem;">
@@ -19,7 +19,7 @@
     <!-- كارت الرفع الرئيسي -->
     <div class="panel-card" style="padding: 2.25rem; position: relative;">
         <!-- رسائل الخطأ -->
-        <div id="error-alert-box" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #fca5a5;">
+        <div id="error-alert-box" style="display: none; background: var(--danger-bg); border: 1px solid var(--danger); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: var(--danger);">
             <div id="error-message-text"></div>
         </div>
 
@@ -89,7 +89,7 @@
                     <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: rgba(255, 255, 255, 0.02); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
                         <input type="radio" asp-for="AppendToExisting" value="false" checked style="margin-top: 0.2rem; accent-color: var(--primary);" />
                         <div>
-                            <strong style="display: block; font-size: 0.9rem; color: #fff;">استبدال شامل لكشوف الشهر</strong>
+                            <strong style="display: block; font-size: 0.9rem; color: var(--text-primary);">استبدال شامل لكشوف الشهر</strong>
                             <small style="color: var(--text-secondary); font-size: 0.8rem; display: block; margin-top: 0.2rem;">
                                 مسح أي كشوف سابقة لنفس الشهر والنوع وإعادة بنائها نظيفة من الملفات المختارة.
                             </small>
@@ -125,7 +125,7 @@
                     
                     <label for="file-input" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 0;">
                         <span style="font-size: 3rem;">📊</span>
-                        <span id="drop-title" style="font-weight: 700; color: #a5b4fc; font-size: 1.1rem;">
+                        <span id="drop-title" style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">
                             انقر هنا أو اسحب وأفلت ملفات الإكسيل (.xlsx)
                         </span>
                         <span style="font-size: 0.88rem; color: var(--text-muted); max-width: 520px; line-height: 1.6;">
@@ -141,10 +141,10 @@
                             📋 قائمة الملفات الجاهزة للقراءة والمعالجة:
                         </span>
                         <div style="display: flex; gap: 0.5rem;">
-                            <label for="file-input" class="btn" style="cursor: pointer; padding: 0.25rem 0.65rem; font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.35);">
+                            <label for="file-input" class="btn-action-subtle" style="cursor: pointer; padding: 0.25rem 0.65rem; font-size: 0.8rem;">
                                 ➕ إضافة ملفات أخرى
                             </label>
-                            <button type="button" onclick="clearAllFiles()" class="btn" style="padding: 0.25rem 0.65rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+                            <button type="button" onclick="clearAllFiles()" class="btn" style="padding: 0.25rem 0.65rem; font-size: 0.8rem; background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger);">
                                 🗑️ مسح الكل
                             </button>
                         </div>
@@ -163,14 +163,14 @@
         </form>
 
         <!-- نافذة مؤشر التقدم الحي (Live Progress Modal Overlay) -->
-        <div id="progress-modal" style="display: none; position: absolute; inset: 0; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border-radius: var(--radius-lg); z-index: 50; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
+        <div id="progress-modal" style="display: none; position: absolute; inset: 0; background: var(--surface-card); backdrop-filter: blur(10px); border-radius: var(--radius-lg); z-index: 50; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg);">
             <div style="width: 100%; max-width: 500px;">
                 <!-- أيقونة الدوران والنبض -->
                 <div style="font-size: 3.6rem; margin-bottom: 1.25rem; animation: pulse 1.5s infinite ease-in-out;">
                     ⚙️
                 </div>
 
-                <h3 id="progress-title" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">
+                <h3 id="progress-title" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-primary);">
                     جاري قراءة وتفريغ الملفات...
                 </h3>
 
@@ -331,7 +331,7 @@
                 selectedContainer.style.display = 'none';
                 filesBadge.style.display = 'none';
                 dropTitle.innerHTML = 'انقر هنا أو اسحب وأفلت ملفات الإكسيل (.xlsx)';
-                dropTitle.style.color = '#a5b4fc';
+                dropTitle.style.color = 'var(--primary)';
                 dropZone.style.borderColor = 'rgba(99, 102, 241, 0.4)';
                 dropZone.style.background = 'rgba(99, 102, 241, 0.03)';
                 btnText.innerText = 'بدء المعالجة وحفظ البيانات في الجداول';
@@ -343,7 +343,7 @@
             filesBadge.innerText = `${selectedFiles.length} ملفات مختارة`;
 
             const totalSize = selectedFiles.reduce((acc, f) => acc + f.size, 0);
-            dropTitle.innerHTML = `✓ تم اختيار <strong style="color: #fff;">${selectedFiles.length}</strong> ملف (${formatBytes(totalSize)})`;
+            dropTitle.innerHTML = `✓ تم اختيار <strong style="color: var(--text-primary);">${selectedFiles.length}</strong> ملف (${formatBytes(totalSize)})`;
             dropTitle.style.color = 'var(--success)';
             dropZone.style.borderColor = 'var(--success)';
             dropZone.style.background = 'rgba(16, 185, 129, 0.04)';
@@ -361,7 +361,7 @@
                     <div style="display: flex; align-items: center; gap: 0.75rem; overflow: hidden;">
                         <span style="font-size: 1.4rem;">📊</span>
                         <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            <strong style="color: #fff; font-size: 0.92rem; display: block; overflow: hidden; text-overflow: ellipsis;">${file.name}</strong>
+                            <strong style="color: var(--text-primary); font-size: 0.92rem; display: block; overflow: hidden; text-overflow: ellipsis;">${file.name}</strong>
                             <small style="color: var(--text-muted); font-size: 0.78rem;">${formatBytes(file.size)}</small>
                         </div>
                     </div>
